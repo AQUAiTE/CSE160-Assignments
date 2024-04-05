@@ -95,6 +95,9 @@ function handleDrawOperationEvent() {
         case "dot":
             console.log("Angle: ", Vector3.dot(v1, v2));
             break;
+        case "area":
+            console.log("Area of the triangle: ", Vector3.cross(v1, v2));
+            break;
     }
 
 }
