@@ -90,13 +90,9 @@ class Vector3 {
     static dot(other1, other2) {
         // Use formula: angle = acos( (a dot b) / (||a|| ||b||))
         // Calculate a dot b
-        let dotProduct = other1.elements[0] * other2.elements[0];
-        dotProduct += other1.elements[1] * other2.elements[1];
-        dotProduct += other1.elements[2] * other2.elements[2];
-
-        // Implement formula then convert to degrees
-        let d = Math.acos(dotProduct / (other1.magnitude() * other2.magnitude()) );
-        d = (d * 180) / Math.PI;
+        let d = other1.elements[0] * other2.elements[0];
+        d += other1.elements[1] * other2.elements[1];
+        d += other1.elements[2] * other2.elements[2];
 
         return d;
     }
@@ -119,8 +115,7 @@ class Vector3 {
         
         let v3 = new Vector3([crossX, crossY, crossZ]);
         
-        // Triangle: ||a x b|| / 2
-        return v3.magnitude() / 2;
+        return v3;
     }
 
     /**

@@ -93,10 +93,16 @@ function handleDrawOperationEvent() {
             drawVector(v2, "green");
             break;
         case "dot":
-            console.log("Angle: ", Vector3.dot(v1, v2));
+            // Convert dot product to degrees
+            let dotProd = Vector3.dot(v1, v2);
+            dotProd = Math.acos (dotProd / (v1.magnitude() * v2.magnitude()));
+            dotProd = (dotProd * 180) / Math.PI;
+            console.log("Angle: ", dotProd);
             break;
         case "area":
-            console.log("Area of the triangle: ", Vector3.cross(v1, v2));
+            let v3 = Vector3.cross(v1, v2);
+            // Triangle: ||a x b|| / 2
+            console.log("Area of the triangle: ", v3.magnitude() / 2);
             break;
     }
 
