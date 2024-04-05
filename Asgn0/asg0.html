@@ -27,6 +27,21 @@
         <!--Draw Button-->
         <input type="button" value="Draw" onclick="handleDrawEvent()">
 
+        <!--Adding support for basic operation selection-->
+        <br>
+        <label for="operations">Operation:</label>
+        <select name="operation" id="operations">
+            <option value="add">Add</option>
+            <option value="subtract">Subtract</option>
+            <option value="multiply">Multiply</option>
+            <option value="divide">Divide</option>
+        </select>
+        <label for="scalarValue">Scalar:</label>
+        <input type="number" id="scalar" name="scalar" />
+        <br>
+        <input type="button" value="Draw" onclick="handleDrawOperationEvent()">
+        
+
         <script src="lib/cuon-matrix-cse160.js"></script>
         <script src="asg0.js"></script>
 
