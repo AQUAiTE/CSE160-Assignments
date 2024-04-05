@@ -8,7 +8,21 @@
         <canvas id = "example" width="400" height="400">
             Please use a browser that supports "canvas"
         </canvas>
+        <br>
+        
+        <!--Inputs for x and y-->
+        <label for="xCoord">v1: x</label>
+        <input type="number" id="xCoord" name="x" />
+        <label for="yCoord">y</label>
+        <input type="number" id="yCoord" name="y"/>
+        
+        <br>
+        
+        <!--Draw Button-->
+        <input type="button" value="Draw" onclick="handleDrawEvent()">
+
         <script src="lib/cuon-matrix-cse160.js"></script>
         <script src="asg0.js"></script>
     </body>
+
 </html>
