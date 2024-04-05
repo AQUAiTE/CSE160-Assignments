@@ -92,6 +92,9 @@ function handleDrawOperationEvent() {
             drawVector(v1, "green");
             drawVector(v2, "green");
             break;
+        case "dot":
+            console.log("Angle: ", Vector3.dot(v1, v2));
+            break;
     }
 
 }

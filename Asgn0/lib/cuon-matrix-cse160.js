@@ -84,14 +84,20 @@ class Vector3 {
     };
 
     /**
-      * Calcualte the dop product between this vector and other.
+      * Calcualte the dot product between this vector and other.
       * @return scalar
       */
     static dot(other1, other2) {
-        // Insert your code here.
-        let d = 0; // Modify this line to calculate this vector's magnitude.
+        // Use formula: angle = acos( (a dot b) / (||a|| ||b||))
+        // Calculate a dot b
+        let dotProduct = other1.elements[0] * other2.elements[0];
+        dotProduct += other1.elements[1] * other2.elements[1];
+        dotProduct += other1.elements[2] * other2.elements[2];
 
-        // Don't delete the return statement.
+        // Implement formula then convert to degrees
+        let d = Math.acos(dotProduct / (other1.magnitude() * other2.magnitude()) );
+        d = (d * 180) / Math.PI;
+
         return d;
     }
 
@@ -127,7 +133,7 @@ class Vector3 {
         this.elements[0] /= magnitude;
         this.elements[1] /= magnitude;
         this.elements[2] /= magnitude;
-        
+
         return this;
     };
 }
