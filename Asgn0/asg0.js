@@ -55,32 +55,44 @@ function handleDrawOperationEvent() {
     let xV2 = document.getElementById("xV2").value;
     let yV2 = document.getElementById("yV2").value;
     let v2 = new Vector3([xV2, yV2, 0.0]);
-    console.log(v1);
-    console.log(v2.elements);
     drawVector(v2, "blue");
 
     // Determine and handle the operation input
     let scalarValue = document.getElementById("scalar").value;
     let op = document.getElementById("operations").value;
 
-    if (op == "add") {
-        v1.add(v2);
-        drawVector(v1, "green");
-    } else if (op == "subtract") {
-        v1.sub(v2);
-        drawVector(v1, "green");
-    } else if (op == "multiply") {
-        v1.mul(scalarValue);
-        v2.mul(scalarValue);
-        drawVector(v1, "green");
-        drawVector(v2, "green");
-    } else {
-        v1.div(scalarValue);
-        v2.div(scalarValue);
-        drawVector(v1, "green");
-        drawVector(v2, "green");
+    switch (op) {
+        case "add":
+            v1.add(v2);
+            drawVector(v1, "green");
+            break;
+        case "subtract":
+            v1.sub(v2);
+            drawVector(v1, "green");
+            break;
+        case "multiply":
+            v1.mul(scalarValue);
+            v2.mul(scalarValue);
+            drawVector(v1, "green");
+            drawVector(v2, "green");
+            break;
+        case "divide":
+            v1.div(scalarValue);
+            v2.div(scalarValue);
+            drawVector(v1, "green");
+            drawVector(v2, "green");
+            break;
+        case "magnitude":
+            console.log("Magnitude v1: ", v1.magnitude());
+            console.log("Magnitude v2: ", v2.magnitude());
+            break;
+        case "normalize":
+            v1.normalize();
+            v2.normalize();
+            drawVector(v1, "green");
+            drawVector(v2, "green");
+            break;
     }
-    
 
 }
 
