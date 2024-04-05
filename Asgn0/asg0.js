@@ -61,6 +61,7 @@ function handleDrawOperationEvent() {
     let scalarValue = document.getElementById("scalar").value;
     let op = document.getElementById("operations").value;
 
+    // Operation cases using cuoun operations
     switch (op) {
         case "add":
             v1.add(v2);
