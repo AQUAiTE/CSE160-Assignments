@@ -19,13 +19,17 @@ function handleDrawEvent() {
     ctx.fillStyle = 'rgba(0, 0, 0, 1.0)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Create vector
+    // Create and draw vector
     let xInput = document.getElementById("xCoord").value;
     let yInput = document.getElementById("yCoord").value;
-    let v1 = new Vector3([xInput, yInput, 0.0])
-
-    // Draw red vector
+    let v1 = new Vector3([xInput, yInput, 0.0]);
     drawVector(v1, "red");
+
+    // Create and draw vector
+    let xV2 = document.getElementById("xV2").value;
+    let yV2 = document.getElementById("yV2").value;
+    let v2 = new Vector3([xV2, yV2, 0.0]);
+    drawVector(v2, "blue");
 }
 
 function drawVector(v, color) {
