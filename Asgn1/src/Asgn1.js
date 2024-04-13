@@ -120,6 +120,11 @@ function handleClicks(ev) {
   renderAllShapes();
 }
 
+function handleClearEvent() {
+  g_shapesList = [];
+  renderAllShapes();
+}
+
 // Extract event click and return it in WebGL coords
 function convertCoordinatesEventToGL(ev) {
   var x = ev.clientX; // x coordinate of a mouse pointer
