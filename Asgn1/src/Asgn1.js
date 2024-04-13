@@ -20,6 +20,7 @@ let canvas;
 let gl;
 let a_Position;
 let u_FragColor;
+let g_selectedColor = [1.0,1.0,1.0,1.0];
 
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -57,6 +58,15 @@ function connectVariablesToGLSL() {
 
 }
 
+function addActionsForHtmlUI() {
+
+  // Slider Events
+  document.getElementById('redSlider').addEventListener('mouseup', function() { g_selectedColor[0] = this.value / 100; });
+  document.getElementById('greenSlider').addEventListener('mouseup', function() { g_selectedColor[1] = this.value / 100; });
+  document.getElementById('blueSlider').addEventListener('mouseup', function() { g_selectedColor[2] = this.value / 100; });
+
+}
+
 function main() {
 
   // Set up canvas and gl vars 
@@ -64,6 +74,9 @@ function main() {
 
   // Set up GLSL shader programs and connect GLSL vars
   connectVariablesToGLSL();
+
+  // Set up actions for HTML UI Elements
+  addActionsForHtmlUI();
 
   // Register function (event handler) to be called on a mouse press
   canvas.onmousedown = handleClicks;
@@ -85,14 +98,8 @@ function handleClicks(ev) {
   // Store the coordinates to g_points array
   g_points.push([x, y]);
 
-  // Store the coordinates to g_points array
-  if (x >= 0.0 && y >= 0.0) {      // First quadrant
-    g_colors.push([1.0, 0.0, 0.0, 1.0]);  // Red
-  } else if (x < 0.0 && y < 0.0) { // Third quadrant
-    g_colors.push([0.0, 1.0, 0.0, 1.0]);  // Green
-  } else {                         // Others
-    g_colors.push([1.0, 1.0, 1.0, 1.0]);  // White
-  }
+  // Store the color to g_points array
+  g_colors.push(g_selectedColor.slice());
 
   // Draw every shape that is supposed to be in the canvas
   renderAllShapes();
