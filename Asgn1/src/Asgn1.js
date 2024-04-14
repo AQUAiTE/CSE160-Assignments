@@ -19,6 +19,7 @@ var FSHADER_SOURCE = `
 // Constant Vars
 const POINT = 0;
 const TRIANGLE = 1;
+const CIRCLE = 2;
 
 // Global Vars
 let canvas;
@@ -31,6 +32,7 @@ let u_Size;
 let g_selectedColor = [1.0,1.0,1.0,1.0];
 let g_selectedSize = 5;
 let g_selectedType = POINT;
+let g_selectedSegments = 10;
 
 function setupWebGL() {
   // Retrieve <canvas> element
@@ -82,10 +84,12 @@ function addActionsForHtmlUI() {
   document.getElementById('greenSlider').addEventListener('mouseup', function() { g_selectedColor[1] = this.value / 100; });
   document.getElementById('blueSlider').addEventListener('mouseup', function() { g_selectedColor[2] = this.value / 100; });
   document.getElementById('sizeSlider').addEventListener('mouseup', function() { g_selectedSize = this.value; });
+  document.getElementById('segmentSlider').addEventListener('mouseup', function () {g_selectedSegments = this.value; });
 
   // Button Events
   document.getElementById('pointButton').onclick = function () {g_selectedType = POINT};
   document.getElementById('triangleButton').onclick = function () {g_selectedType = TRIANGLE};
+  document.getElementById('circleButton').onclick = function () {g_selectedType = CIRCLE};
 
 }
 
@@ -123,13 +127,16 @@ function handleClicks(ev) {
 
   if (g_selectedType == POINT) {
     point = new Point();
-  } else {
+  } else if (g_selectedType == TRIANGLE) {
     point = new Triangle();
+  } else {
+    point = new Circle();
   }
 
   point.position = [x,y];
   point.color = g_selectedColor.slice();
   point.size = g_selectedSize;
+  point.segments = g_selectedSegments;
   g_shapesList.push(point);
 
   // Draw every shape that is supposed to be in the canvas
