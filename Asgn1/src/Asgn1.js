@@ -164,6 +164,7 @@ function convertCoordinatesEventToGL(ev) {
 function renderAllShapes() {
   //var startTime = performance.now();
   // Clear <canvas>
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   var len = g_shapesList.length;
@@ -185,5 +186,59 @@ function sendTextToHTML(text, htmlID) {
   }
 
   htmlElm.innerHTML = text;
+
+}
+
+function handleSpecialEvent() {
+  // Clear the canvas with two different colors
+  // Specify the first color for the left half of the canvas
+  gl.clearColor(0.99, 0.67, 0.1, 1.0); // Red color
+
+  // Clear the left half of the canvas
+  gl.scissor(0, 0, canvas.width / 2, canvas.height);
+  gl.enable(gl.SCISSOR_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.disable(gl.SCISSOR_TEST);
+
+  // Specify the second color for the right half of the canvas
+  gl.clearColor(0.16, 0.22, 0.5, 1.0); // Blue color
+
+  // Clear the right half of the canvas
+  gl.scissor(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+  gl.enable(gl.SCISSOR_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.disable(gl.SCISSOR_TEST);
+
+  // Set the color of the triangle to white
+  gl.uniform4f(u_FragColor, 1.0, 1.0, 1.0, 1.0); // White color
+
+  drawTriangle([-0.08, 0.16, -0.16, 0.24, -0.20, 0.16]);
+  drawTriangle([-0.20, 0.16, -0.16, 0.24, -0.24, 0.24]);
+  drawTriangle([-0.20, 0.16, -0.24, 0.24, -0.28, 0.16]);
+  drawTriangle([-0.28, 0.16, -0.24, 0.24, -0.40, 0.16]);
+  drawTriangle([-0.40, 0.16, -0.24, 0.24, -0.40, 0.24]);
+  drawTriangle([-0.40, 0.24, -0.40, 0.16, -0.48, 0.16]);
+  drawTriangle([-0.48, 0.16, -0.40, 0.16, -0.40, 0.08]);
+  drawTriangle([-0.48, 0.16, -0.40, 0.16, -0.40, 0.08]);
+  drawTriangle([-0.48, 0.16, -0.44, 0.08, -0.52, 0.08]);
+  drawTriangle([-0.52, 0.08, -0.44, 0.08, -0.48, -0.04]);
+  drawTriangle([-0.48, -0.04, -0.44, 0.08, -0.40, -0.04]);
+  drawTriangle([-0.52, 0.08, -0.52, 0.10, -0.48, -0.04]);
+  drawTriangle([-0.48, -0.04, -0.40, -0.04, -0.44, -0.16]);
+  drawTriangle([-0.44, -0.16, -0.48, -0.04, -0.52, -0.16]);
+  drawTriangle([-0.52, -0.16, -0.44, -0.16, -0.44, -0.24]);
+  drawTriangle([-0.44, -0.24, -0.44, -0.16, -0.36, -0.24]);
+  drawTriangle([-0.36, -0.24, -0.44, -0.16, -0.36, -0.16]);
+  drawTriangle([-0.36, -0.16, -0.36, -0.24, -0.28, -0.24]);
+  drawTriangle([-0.28, -0.24, -0.28, -0.16, -0.36, -0.16]);
+  drawTriangle([-0.28, -0.16, -0.28, -0.24, -0.16, -0.16]);
+  drawTriangle([-0.16, -0.16, -0.16, -0.24, -0.28, -0.24]);
+  drawTriangle([-0.16, -0.24, -0.08, -0.24, -0.16, -0.20]);
+  drawTriangle([-0.16, -0.20, -0.16, -0.16, -0.08, -0.16]);
+  drawTriangle([-0.08, -0.24, -0.16, -0.20, -0.08, -0.16]);
+  drawTriangle([-0.48, 0.16, -0.44, 0.08, -0.4, 0.08])
+  drawTriangle([-0.4, 0.08, -0.44, 0.08, -0.4, -0.04])
+  drawTriangle([-0.52, 0.08, -0.52, -0.16, -0.48, -0.04]);
+  drawTriangle([-0.4, -0.04, -0.4, -0.16, -0.44, -0.16]);
 
 }
