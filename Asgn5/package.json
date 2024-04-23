@@ -7,6 +7,7 @@
     "vite": "^5.2.10"
   },
   "scripts": {
+    "predeploy": "npx vite build",
     "deploy": "gh-pages -d dist"
   }
 }
