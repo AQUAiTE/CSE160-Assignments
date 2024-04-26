@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Draw a point (1)</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body onload="main()">
+    <div id="container">
+      <canvas id="webgl" width="400" height="400">
+        Please use a browser that supports "canvas"
+      </canvas>
+      <div id="reference-image" style="display: none;">
+        <img src="../img/virtual_drawing.png">
+      </div>
+      <div id="comments">
+        <br>
+        Citations:
+        <ul>
+          <li><a href="https://www.w3schools.com/">w3schools For Help With HTML/CSS</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial">Mozilla For Functions Used in Special Event</a></li>
+          <li><a href="https://www.youtube.com/watch?v=rfyhLGeylGA&list=PLbyTU_tFIkcMK5FiV6btXxHQAy15p0j7X">Professor Davis' Walkthrough For Majority of Code</a></li>
+          <li><a href="https://virtual-graph-paper.com/">Site for Graph Paper Drawing</a></li>
+        </ul>
+        <p>Special Note</p>
+        <ul>
+          <li>I could not figure out how to keep the hardcoded drawing, so it disappears when drawing again. </li>
+          <li>I drew it on the site above because I am terrible at drawing and I just could not make it look how I wanted.</li>
+        </ul>
+      </div>
+      <div id="features">
+        <p> Special Feature(s):</p>
+        <br>
+        I could not think of a specific big feature, so I made a lot of small additions:
+        <ul>
+          <li>Addded a custom brush icon.</li>
+          <li>Gave the canvas a special shadow and gave the site a fancy font.</li>
+          <li>Added a night mode that inverts the page colors.</li>
+          <li>Custom drawing has music accompaniment when it appears.</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!--<p id="numdot"> XXX </p>-->
+
+    <br>
+    <!--Buttons-->
+    <input type="button" value="Clear" onclick="handleClearEvent()">
+    <input type="button" value="Night Mode" title="Click to rest your eyes!" onclick="handleNightModeToggle()">
+    <audio id="cs2Theme">
+      <source src="../img/CS2.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    <input type="button" value="Surprise!" id="surpriseButton" title="Click for a special song!">
+    <br>
+    <br>
+    <input type="button" value="Point" id="pointButton">
+    <input type="button" value="Triangle" id="triangleButton">
+    <input type="button" value = "Circle" id="circleButton">
+
+    <p>
+    Red <input type="range" min="0" max="100" value="100" class="slider" id="redSlider">
+    <p>
+    Green <input type="range" min="0" max="100" value="100" class="slider" id="greenSlider">
+    <p>
+    Blue <input type="range" min="0" max="100" value="100" class="slider" id="blueSlider">
+    <p>
+    Size <input type="range" min="5" max="40" value="0" class="slider" id="sizeSlider">
+    <p>
+    Circle Segments <input type="range" min="10" max="50" value="10" class="slider" id="segmentSlider">
+
+  
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="Circle.js"></script>
+    <script src="Triangle.js"></script>
+    <script src="Point.js"></script>
+    <script src="Asgn1.js"></script>
+  </body>
+</html>
