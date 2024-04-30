@@ -2,12 +2,6 @@ canvas:hover {
     cursor: url('../img/paintbrush.png') 0 30, auto;
 }
 
-canvas {
-    box-shadow: 0 0 50px 20px rgba(27, 199, 119, 0.8) inset, 
-                0 0 0 10px #fff inset,
-                0 0 50px 20px rgba(29, 221, 148, 0.8);
-}
-
 .nightMode canvas {
     box-shadow: 0 0 50px 20px rgba(82, 4, 207, 0.8) inset, 
                 0 0 0 10px #000 inset,

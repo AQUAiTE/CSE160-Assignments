@@ -42,41 +42,26 @@
       </div>
     </div>
     
-    <!--<p id="numdot"> XXX </p>-->
+    <p id="numdot"> XXX </p>
 
+    <!--Buttons/Sliders-->
+    X <input type="range" min="0" max="100" value="100" class="slider" id="xJoint">
     <br>
-    <!--Buttons-->
-    <input type="button" value="Clear" onclick="handleClearEvent()">
-    <input type="button" value="Night Mode" title="Click to rest your eyes!" onclick="handleNightModeToggle()">
-    <audio id="cs2Theme">
-      <source src="../img/CS2.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-    <input type="button" value="Surprise!" id="surpriseButton" title="Click for a special song!">
+    Y <input type="range" min="0" max="100" value="0" class="slider" id="yJoint">
     <br>
+    Joint <input type="range" min="-45" max="45" value="0" class="slider" id="joint">
     <br>
-    <input type="button" value="Point" id="pointButton">
-    <input type="button" value="Triangle" id="triangleButton">
-    <input type="button" value = "Circle" id="circleButton">
-
-    <p>
-    Red <input type="range" min="0" max="100" value="100" class="slider" id="redSlider">
-    <p>
-    Green <input type="range" min="0" max="100" value="100" class="slider" id="greenSlider">
-    <p>
-    Blue <input type="range" min="0" max="100" value="100" class="slider" id="blueSlider">
-    <p>
-    Size <input type="range" min="5" max="40" value="0" class="slider" id="sizeSlider">
-    <p>
-    Circle Segments <input type="range" min="10" max="50" value="10" class="slider" id="segmentSlider">
+    Camera Angle <input type="range" min="0" max="90" value="5" class="slider" id="cameraSlider">
 
   
     <script src="../lib/webgl-utils.js"></script>
     <script src="../lib/webgl-debug.js"></script>
     <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+    <script src="Asgn2.js"></script>
+    <script src="Cube.js"></script>
     <script src="Circle.js"></script>
-    <script src="Triangle.js"></script>
     <script src="Point.js"></script>
-    <script src="Asgn1.js"></script>
+    <script src="Triangle.js"></script>
   </body>
 </html>
