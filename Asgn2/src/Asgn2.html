@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Draw a point (1)</title>
+    <title>Broque Monsieur</title>
     <link rel="stylesheet" href="styles.css">
   </head>
 
@@ -11,33 +11,35 @@
       <canvas id="webgl" width="400" height="400">
         Please use a browser that supports "canvas"
       </canvas>
-      <div id="reference-image" style="display: none;">
-        <img src="../img/virtual_drawing.png">
+      <div id="sidePanel">
+        Camera Controls:
+        <br>
+        <div>
+          <label for="cameraX">X:</label>
+          <input type="range" id="cameraX" min="0" max="360" class="slider" value="25">
+          <br>
+          <label for="cameraY">Y:</label>
+          <input type="range" id="cameraY" min="0" max="360" class="slider" value="0">
+        </div>
+        
       </div>
       <div id="comments">
+        <p> My Info:</p>
+        <br>
+        Name: Matthew Solomon
+        Email: fsolomon@ucsc.edu
         <br>
         Citations:
         <ul>
           <li><a href="https://www.w3schools.com/">w3schools For Help With HTML/CSS</a></li>
           <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial">Mozilla For Functions Used in Special Event</a></li>
-          <li><a href="https://www.youtube.com/watch?v=rfyhLGeylGA&list=PLbyTU_tFIkcMK5FiV6btXxHQAy15p0j7X">Professor Davis' Walkthrough For Majority of Code</a></li>
-          <li><a href="https://virtual-graph-paper.com/">Site for Graph Paper Drawing</a></li>
+          <li><a href="https://www.youtube.com/watch?v=8xgejUPmGgo&list=PLbyTU_tFIkcPmW6JknG_z9jdWDpJt7DYS&index=1">Professor Davis' Walkthrough For Majority of Code</a></li>
         </ul>
-        <p>Special Note</p>
+        Notes:
         <ul>
-          <li>I could not figure out how to keep the hardcoded drawing, so it disappears when drawing again. </li>
-          <li>I drew it on the site above because I am terrible at drawing and I just could not make it look how I wanted.</li>
-        </ul>
-      </div>
-      <div id="features">
-        <p> Special Feature(s):</p>
-        <br>
-        I could not think of a specific big feature, so I made a lot of small additions:
-        <ul>
-          <li>Addded a custom brush icon.</li>
-          <li>Gave the canvas a special shadow and gave the site a fancy font.</li>
-          <li>Added a night mode that inverts the page colors.</li>
-          <li>Custom drawing has music accompaniment when it appears.</li>
+          <li>I have about 25 polygons in total with 5 cylinders and 20 cubes.</li>
+          <li>His hand does not rotate, but it is a 3rd level joint!</li>
+          <li>His name is Broque Monsieur from Mario & Luigi: Bowser's Inside Story!</li>
         </ul>
       </div>
     </div>
@@ -45,14 +47,24 @@
     <p id="numdot"> XXX </p>
 
     <!--Buttons/Sliders-->
-    X <input type="range" min="0" max="100" value="100" class="slider" id="xJoint">
+    Left Elbow: <input type="range" min="0" max="90" value="0" class="slider" id="elbowL"> 
     <br>
-    Y <input type="range" min="0" max="100" value="0" class="slider" id="yJoint">
+    Left Shoulder: &emsp; X <input type="range" min="-90" max="90" value="0" class="slider" id="shoulderLX"> Y <input type="range" min="-60" max="0" value="0" class="slider" id="shoulderLY">
     <br>
-    Joint <input type="range" min="-45" max="45" value="0" class="slider" id="joint">
+    Right Elbow: <input type="range" min="0" max="90" value="0" class="slider" id="elbowR"> 
     <br>
-    Camera Angle <input type="range" min="0" max="360" value="25" class="slider" id="cameraSlider">
-
+    Right Shoulder: &emsp; X <input type="range" min="-90" max="90" value="0" class="slider" id="shoulderRX"> Y <input type="range" min="-60" max="0" value="0" class="slider" id="shoulderRY">
+    <br>
+    Eyebrows: &emsp; (His) Left <input type="range" min="0.0" step = 0.01 max="0.1" value="0" class="slider" id="eyebrowL"> 
+    (His) Right <input type="range" min="0.0" step = 0.01 max="0.1" value="0" class="slider" id="eyebrowR">
+    <br>
+    Moustache Height: &emsp; <input type="range" min="0.0" step = 0.005 max="0.05" value="0" class="slider" id="moustache">
+    <br>
+    Idle Animation: <button type="button" id="idleOn">On</button>
+    <button type="button" id="idleOff">Off</button>
+    <br>
+    <!--<input type="checkbox" id="toggleMouseControl" name="mouseControl"/>
+    <label for="toggleMouseControl">Control Canvas with Mouse?</label>-->
   
     <script src="../lib/webgl-utils.js"></script>
     <script src="../lib/webgl-debug.js"></script>

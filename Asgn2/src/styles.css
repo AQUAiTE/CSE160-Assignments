@@ -37,7 +37,7 @@ input[type="button"], input[type="range"] {
     width: 200px;
     padding: 20px;
     position: fixed;
-    right: 265px;
+    right: 10px;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
@@ -45,15 +45,10 @@ input[type="button"], input[type="range"] {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-#features {
+#sidePanel {
     display: flex;
-    width: 200px;
     padding: 20px;
-    position: fixed;
-    right: 0px;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    background-color: #bba232;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
