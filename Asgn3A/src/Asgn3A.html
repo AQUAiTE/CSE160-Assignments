@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Virtual World 3A</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body onload="main()">
+    <div id="container">
+      <canvas id="webgl" width="400" height="400">
+        Please use a browser that supports "canvas"
+      </canvas>
+      <div id="sidePanel">
+        Camera Controls:
+        <br>
+        <div>
+          <label for="cameraX">X:</label>
+          <input type="range" id="cameraX" min="0" max="360" class="slider" value="25">
+          <br>
+          <label for="cameraY">Y:</label>
+          <input type="range" id="cameraY" min="0" max="360" class="slider" value="0">
+        </div>
+        
+      </div>
+      <div id="comments">
+        <p> My Info:</p>
+        <br>
+        Name: Matthew Solomon
+        Email: fsolomon@ucsc.edu
+        <br>
+        Citations:
+        <ul>
+          <li><a href="https://www.w3schools.com/">w3schools For Help With HTML/CSS</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial">Mozilla For Functions Used in Special Event</a></li>
+          <li><a href="https://www.youtube.com/watch?v=8xgejUPmGgo&list=PLbyTU_tFIkcPmW6JknG_z9jdWDpJt7DYS&index=1">Professor Davis' Walkthrough For Majority of Code</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <p id="numdot"> XXX </p>
+
+    <!--Buttons/Sliders-->
+  
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+    <script src="../node_modules/stats.js/build/stats.min.js"></script>
+    <script src="World.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Cylinder.js"></script>
+    <script src="Triangle.js"></script>
+  </body>
+</html>
