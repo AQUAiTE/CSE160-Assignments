@@ -20,10 +20,16 @@ var FSHADER_SOURCE = `
   varying vec2 v_UV;
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
+  uniform sampler2D u_Sampler1;
+  uniform int u_TextureUnit;
   void main() {
     gl_FragColor = u_FragColor;
     gl_FragColor = vec4(v_UV, 1.0, 1.0);
-    gl_FragColor = texture2D(u_Sampler0, v_UV);
+    if (u_TextureUnit == 0) {
+      gl_FragColor = texture2D(u_Sampler0, v_UV);
+    } else {
+      gl_FragColor = texture2D(u_Sampler1, v_UV);
+    }
   }`
 
 // Global Vars
@@ -37,10 +43,12 @@ let u_GlobalRotateMatrix;
 //let u_ProjectionMatrix;
 //let u_ViewMatrix;
 let u_Sampler0;
+let u_Sampler1;
+let u_TextureUnit;
 
 
 // UI Global Vars
-let g_globalAngle = [25, 0];
+let g_globalAngle = [0, 83];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
@@ -144,6 +152,19 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  // Get the storage location of u_Sampler1
+  u_Sampler1 = gl.getUniformLocation(gl.program, 'u_Sampler1');
+  if (!u_Sampler1) {
+    console.log('Failed to get the storage location of u_Sampler1');
+    return;
+  } 
+
+  u_TextureUnit = gl.getUniformLocation(gl.program, 'u_TextureUnit');
+  if (!u_TextureUnit) {
+    console.log('Failed to get the storage location of u_TextureUnit');
+    return;
+  }
+
   // Set identity matrix at first
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
@@ -157,35 +178,43 @@ function addActionsForHtmlUI() {
 }
 
 function initTextures() {
-  var image = new Image();
-  if (!image) {
+  var image0 = new Image();
+  var image1 = new Image();
+  if (!image0 || !image1) {
     console.log('Failed to create the image object');
     return false;
   }
 
-  image.onload = function() { loadTexture(image); };
-  image.src = '../assets/64Mountains.png';
+  image1.onload = function() { loadTexture(image0, image1); };
+  image0.src = '../assets/64Mountains.png';
+  image1.src = '../assets/64SeaClouds.png'
 
   return true;
 }
 
-function loadTexture(image) {
-  var texture = gl.createTexture();
-  if (!texture) {
+function loadTexture(image0, image1) {
+  var texture0 = gl.createTexture();
+  var texture1 = gl.createTexture();
+  if (!texture0 || !texture1) {
     console.log('Failed to create the texture object');
     return false;
   }
 
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
+  // Set up texture for image0
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture0);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image0);
   gl.uniform1i(u_Sampler0, 0);
 
-  console.log("Texture Loaded");
+  // Set up texture for image1
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, texture1);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image1);
+  gl.uniform1i(u_Sampler1, 1);
 }
 
 // Functions to load canvas and draw 3D Model =============================================================================
@@ -237,8 +266,11 @@ function renderAllShapes() {
   globalRotMatrix.rotate(g_globalAngle[1], 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMatrix.elements);
 
+  // Use image1 for head
+  gl.uniform1i(u_TextureUnit, 1);
   buildHead();
 
+  gl.uniform1i(u_TextureUnit, 0);
   buildBody();
 
   buildArms();
