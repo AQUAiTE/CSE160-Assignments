@@ -48,7 +48,7 @@ let u_TextureUnit;
 
 
 // UI Global Vars
-let g_globalAngle = [0, 90];
+let g_globalAngle = [0, 0];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
