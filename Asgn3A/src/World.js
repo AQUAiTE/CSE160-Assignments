@@ -22,14 +22,17 @@ var FSHADER_SOURCE = `
   uniform sampler2D u_Sampler0;
   uniform sampler2D u_Sampler1;
   uniform int u_TextureUnit;
+  uniform float u_texColorWeight;
   void main() {
-    gl_FragColor = u_FragColor;
     gl_FragColor = vec4(v_UV, 1.0, 1.0);
+    vec4 texColor;
     if (u_TextureUnit == 0) {
-      gl_FragColor = texture2D(u_Sampler0, v_UV);
+      texColor = texture2D(u_Sampler0, v_UV);
     } else {
-      gl_FragColor = texture2D(u_Sampler1, v_UV);
+      texColor = texture2D(u_Sampler1, v_UV);
     }
+    // Final Color/Texture Set Based on texColorWeight
+    gl_FragColor = (1.0 - u_texColorWeight) * u_FragColor + u_texColorWeight * texColor;
   }`
 
 // Global Vars
@@ -45,10 +48,11 @@ let u_GlobalRotateMatrix;
 let u_Sampler0;
 let u_Sampler1;
 let u_TextureUnit;
+let u_texColorWeight;
 
 
 // UI Global Vars
-let g_globalAngle = [0, 0];
+let g_globalAngle = [0, 181];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
@@ -159,11 +163,21 @@ function connectVariablesToGLSL() {
     return;
   } 
 
+  // Get the storage location of u_TextureUnit
   u_TextureUnit = gl.getUniformLocation(gl.program, 'u_TextureUnit');
   if (!u_TextureUnit) {
     console.log('Failed to get the storage location of u_TextureUnit');
     return;
   }
+
+  // Get the storage location of u_texColorWeight
+  u_texColorWeight = gl.getUniformLocation(gl.program, 'u_texColorWeight');
+  if (!u_texColorWeight) {
+    console.log('Failed to get the storage location of u_texColorWeight');
+    return;
+  }
+
+
 
   // Set identity matrix at first
   var identityM = new Matrix4();
@@ -186,7 +200,7 @@ function initTextures() {
   }
 
   image1.onload = function() { loadTexture(image0, image1); };
-  image0.src = '../assets/64Mountains.png';
+  image0.src = '../assets/PinkShrooms.png';
   image1.src = '../assets/64SeaClouds.png'
 
   return true;
@@ -266,16 +280,30 @@ function renderAllShapes() {
   globalRotMatrix.rotate(g_globalAngle[1], 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMatrix.elements);
 
-  // Use image1 for head
+  // Use the Sea and Clouds Image
   gl.uniform1i(u_TextureUnit, 1);
-  buildHead();
+  // Use the texture
+  gl.uniform1f(u_texColorWeight, 1.0);
+  buildSky();
 
   gl.uniform1i(u_TextureUnit, 0);
+  buildGround();
+
+  
+  // BROQUE MONSIEUR: REMOVED FOR NOW
+  // Use the texture
+  //gl.uniform1f(u_texColorWeight, 1.0);
+  //buildHead();
+
+  // Use the Mountain Image
+  //gl.uniform1i(u_TextureUnit, 0);
   //buildBody();
 
   //buildArms();
 
- // buildLegs();
+  // Use the base color
+  //gl.uniform1f(u_texColorWeight, 0.0);
+  //buildLegs();
 
 }
 
@@ -285,6 +313,21 @@ function tick() {
     stats.end();
 
     requestAnimationFrame(tick);
+}
+
+// Build the Sky and Ground ================================================================================================
+function buildSky() {
+  const sky = new Cube();
+  sky.color = [0.5, 0.5, 1.0, 1.0];
+  sky.matrix.scale(0.8, 0.8, 0.8);
+  sky.render();
+}
+
+function buildGround() {
+  const ground = new Cube();
+  ground.color = [0.0, 0.0, 0.0, 1.0];
+  ground.matrix.scale(100, 0, 100);
+  ground.render();
 }
 
 
@@ -468,6 +511,7 @@ function buildArms() {
   forearmL.matrix.scale(0.1, 0.05, 0.05);
   forearmL.render();
 
+  gl.uniform1f(u_texColorWeight, 0.0);
   const leftHand = new Cube();
   leftHand.color = [1.0, 1.0, 1.0, 1.0];
   leftHand.matrix = forearmLCoords;
@@ -475,7 +519,7 @@ function buildArms() {
   leftHand.matrix.scale(0.1, 0.1, 0.1);
   leftHand.render();
 
-
+  gl.uniform1f(u_texColorWeight, 1.0);
   const rightArm = new Cube();
   rightArm.color = [0.0, 0.0, 0.0, 1.0];
   rightArm.matrix.setTranslate(-0.28, 0.125, 0.0);
@@ -498,12 +542,11 @@ function buildArms() {
   forearmR.matrix.scale(0.1, 0.05, 0.05);
   forearmR.render();
 
+  gl.uniform1f(u_texColorWeight, 0.0);
   const rightHand = new Cube();
   rightHand.color = [1.0, 1.0, 1.0, 1.0];
   rightHand.matrix = forearmRCoords;
   rightHand.matrix.translate(-0.2, 0.0, 0.0);
   rightHand.matrix.scale(0.1, 0.1, 0.1);
   rightHand.render();
-
-
 }
