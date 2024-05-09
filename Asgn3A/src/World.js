@@ -156,13 +156,7 @@ function addActionsForHtmlUI() {
   document.getElementById('cameraY').addEventListener('input', function() { g_globalAngle[1] = this.value; renderAllShapes(); });
 }
 
-function initTextures(gl, n) {
-  u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler');
-  if (!u_Sampler0) {
-    console.log('Failed to get the storage location of u_Sampler');
-    return;
-  }
-
+function initTextures() {
   var image = new Image();
   if (!image) {
     console.log('Failed to create the image object');
@@ -170,22 +164,26 @@ function initTextures(gl, n) {
   }
 
   image.onload = function() { loadTexture(image); };
-  image.src = '../assets/sky.jpg';
+  image.src = '../assets/64Mountains.png';
 
   return true;
 }
 
 function loadTexture(image) {
-  let texture = gl.createTexture();
+  var texture = gl.createTexture();
+  if (!texture) {
+    console.log('Failed to create the texture object');
+    return false;
+  }
 
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.texture_2D, texture);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
   
-  gl.textParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.textImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
 
-  gl.uniformli(u_Sampler0, 0);
+  gl.uniform1i(u_Sampler0, 0);
 
   console.log("Texture Loaded");
 }
@@ -201,6 +199,8 @@ function main() {
 
   // Set up actions for HTML UI Elements
   addActionsForHtmlUI();
+
+  initTextures();
 
   // Specify the color for clearing <canvas>
   gl.clearColor(0.53, 0.87, 0.98, 1.0);
