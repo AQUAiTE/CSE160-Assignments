@@ -48,7 +48,7 @@ let u_TextureUnit;
 
 
 // UI Global Vars
-let g_globalAngle = [0, 83];
+let g_globalAngle = [0, 90];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
@@ -271,11 +271,11 @@ function renderAllShapes() {
   buildHead();
 
   gl.uniform1i(u_TextureUnit, 0);
-  buildBody();
+  //buildBody();
 
-  buildArms();
+  //buildArms();
 
-  buildLegs();
+ // buildLegs();
 
 }
 
@@ -297,7 +297,7 @@ function buildHead() {
   head.matrix.scale(0.3, 0.3, 0.3);
   head.render();
 
-  // Left Eyeball
+  /*// Left Eyeball
   const leftEye = new Cylinder();
   leftEye.color = [1.0, 1.0, 1.0, 1.0];
   leftEye.matrix.setTranslate(0.125, 0.55, -0.35);
@@ -364,7 +364,7 @@ function buildHead() {
   leftStache.matrix.rotate(-45, 0, 0, 1);
   leftStache.matrix.translate(0.0, 0.0, 0.0);
   leftStache.matrix.scale(0.15, 0.05, 0.02);
-  leftStache.render();
+  leftStache.render();*/
 }
 
 function buildBody() {
