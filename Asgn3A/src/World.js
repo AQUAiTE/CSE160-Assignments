@@ -7,10 +7,10 @@ var VSHADER_SOURCE = `
   varying vec2 v_UV;
   uniform mat4 u_ModelMatrix;
   uniform mat4 u_GlobalRotateMatrix;
-  //uniform mat4 u_ViewMatrix;
-  //uniform mat4 u_ProjectionMatrix;
+  uniform mat4 u_ViewMatrix;
+  uniform mat4 u_ProjectionMatrix;
   void main() {
-    gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
+    gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
     v_UV = a_UV;
   }`
 
@@ -43,8 +43,8 @@ let a_UV;
 let u_FragColor;
 let u_ModelMatrix;
 let u_GlobalRotateMatrix;
-//let u_ProjectionMatrix;
-//let u_ViewMatrix;
+let u_ProjectionMatrix;
+let u_ViewMatrix;
 let u_Sampler0;
 let u_Sampler1;
 let u_TextureUnit;
@@ -52,7 +52,7 @@ let u_texColorWeight;
 
 
 // UI Global Vars
-let g_globalAngle = [0, 181];
+let g_globalAngle = [0, 0];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
@@ -136,18 +136,18 @@ function connectVariablesToGLSL() {
   }
 
   // Get the storage location of u_ProjectionMatrix
- // u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
- // if (!u_ProjectionMatrix) {
- //   console.log('Failed to get the storage location of u_ProjectionMatrix');
- //   return;
- // }
+  u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
+  if (!u_ProjectionMatrix) {
+      console.log('Failed to get the storage location of u_ProjectionMatrix');
+      return;
+  }
 
   // Get the storage location of u_ViewMatrix
- // u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
- // if (!u_ViewMatrix) {
- //   console.log('Failed to get the storage location of u_ViewMatrix');
-  //  return;
- // }
+  u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+  if (!u_ViewMatrix) {
+    console.log('Failed to get the storage location of u_ViewMatrix');
+    return;
+  }
 
   // Get the storage location of u_Sampler0
   u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
@@ -201,7 +201,7 @@ function initTextures() {
 
   image1.onload = function() { loadTexture(image0, image1); };
   image0.src = '../assets/PinkShrooms.png';
-  image1.src = '../assets/64SeaClouds.png'
+  image1.src = 'sky.jpg'
 
   return true;
 }
@@ -275,6 +275,12 @@ function convertCoordinatesEventToGL(ev) {
 function renderAllShapes() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  var projMatrix = new Matrix4();
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMatrix.elements);
+
+  var viewMatrix = new Matrix4();
+  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+
   // Pass matrix to rotate camera angle
   let globalRotMatrix = new Matrix4().rotate(g_globalAngle[0], 0, 1, 0);
   globalRotMatrix.rotate(g_globalAngle[1], 1, 0, 0);
@@ -292,8 +298,8 @@ function renderAllShapes() {
   
   // BROQUE MONSIEUR: REMOVED FOR NOW
   // Use the texture
-  //gl.uniform1f(u_texColorWeight, 1.0);
-  //buildHead();
+  gl.uniform1f(u_texColorWeight, 1.0);
+  buildHead();
 
   // Use the Mountain Image
   //gl.uniform1i(u_TextureUnit, 0);
@@ -319,7 +325,8 @@ function tick() {
 function buildSky() {
   const sky = new Cube();
   sky.color = [0.5, 0.5, 1.0, 1.0];
-  sky.matrix.scale(0.8, 0.8, 0.8);
+  sky.matrix.scale(2, 2, 2);
+  sky.matrix.translate(-0.5, -0.5, -0.5);
   sky.render();
 }
 
