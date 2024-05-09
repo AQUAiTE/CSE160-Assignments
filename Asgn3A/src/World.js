@@ -1,36 +1,52 @@
 // ColoredPoint.js (c) 2012 matsuda
 // Vertex shader program
 var VSHADER_SOURCE = `
+  precision mediump float;
   attribute vec4 a_Position;
+  attribute vec2 a_UV;
+  varying vec2 v_UV;
   uniform mat4 u_ModelMatrix;
   uniform mat4 u_GlobalRotateMatrix;
+  //uniform mat4 u_ViewMatrix;
+  //uniform mat4 u_ProjectionMatrix;
   void main() {
     gl_Position = u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
+    v_UV = a_UV;
   }`
 
 // Fragment shader program
 var FSHADER_SOURCE = `
   precision mediump float;
+  varying vec2 v_UV;
   uniform vec4 u_FragColor;
+  uniform sampler2D u_Sampler0;
   void main() {
     gl_FragColor = u_FragColor;
+    gl_FragColor = vec4(v_UV, 1.0, 1.0);
+    gl_FragColor = texture2D(u_Sampler0, v_UV);
   }`
 
 // Global Vars
 let canvas;
 let gl;
 let a_Position;
+let a_UV;
 let u_FragColor;
 let u_ModelMatrix;
 let u_GlobalRotateMatrix;
+//let u_ProjectionMatrix;
+//let u_ViewMatrix;
+let u_Sampler0;
+
 
 // UI Global Vars
-let g_globalAngle = [0, 0];
+let g_globalAngle = [25, 0];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
 
-// Animation Global Vars
+// Animation Global Vars 
+// *Note: Holdover from previous assignment, breaks the model w/o it
 let g_eyebrowL = 0;
 let g_eyebrowR = 0;
 let g_moustacheHt = 0;
@@ -40,19 +56,15 @@ let g_browRotate = 7;
 let g_browMoveX = 0.0;
 let g_browMoveY = 0.0;
 
-let g_startTime = performance.now()/1000.0;
-let g_seconds = performance.now()/1000.0 - g_startTime;
-
+// Performance Monitor
 var stats = new Stats();
-
-// move panel to right side instead of left
-// cuz our canvas will be covered
 stats.dom.style.left = "auto";
 stats.dom.style.right = "0";
-stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+stats.showPanel(0);
 document.body.appendChild(stats.dom);
 
 
+// Setup Functions =======================================================================================================
 function setupWebGL() {
   // Retrieve <canvas> element
   canvas = document.getElementById('webgl');
@@ -76,10 +88,17 @@ function connectVariablesToGLSL() {
     return;
   }
 
-  // // Get the storage location of a_Position
+  // Get the storage location of a_Position
   a_Position = gl.getAttribLocation(gl.program, 'a_Position');
   if (a_Position < 0) {
     console.log('Failed to get the storage location of a_Position');
+    return;
+  }
+
+  // Get the storage location of a_UV
+  a_UV = gl.getAttribLocation(gl.program, 'a_UV');
+  if (a_UV < 0) {
+    console.log('Failed to get the storage location of a_UV');
     return;
   }
 
@@ -104,6 +123,27 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  // Get the storage location of u_ProjectionMatrix
+ // u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
+ // if (!u_ProjectionMatrix) {
+ //   console.log('Failed to get the storage location of u_ProjectionMatrix');
+ //   return;
+ // }
+
+  // Get the storage location of u_ViewMatrix
+ // u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+ // if (!u_ViewMatrix) {
+ //   console.log('Failed to get the storage location of u_ViewMatrix');
+  //  return;
+ // }
+
+  // Get the storage location of u_Sampler0
+  u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler0');
+  if (!u_Sampler0) {
+    console.log('Failed to get the storage location of u_Sampler0');
+    return;
+  }
+
   // Set identity matrix at first
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
@@ -116,6 +156,41 @@ function addActionsForHtmlUI() {
   document.getElementById('cameraY').addEventListener('input', function() { g_globalAngle[1] = this.value; renderAllShapes(); });
 }
 
+function initTextures(gl, n) {
+  u_Sampler0 = gl.getUniformLocation(gl.program, 'u_Sampler');
+  if (!u_Sampler0) {
+    console.log('Failed to get the storage location of u_Sampler');
+    return;
+  }
+
+  var image = new Image();
+  if (!image) {
+    console.log('Failed to create the image object');
+    return false;
+  }
+
+  image.onload = function() { loadTexture(image); };
+  image.src = '../assets/sky.jpg';
+
+  return true;
+}
+
+function loadTexture(image) {
+  let texture = gl.createTexture();
+
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.texture_2D, texture);
+  
+  gl.textParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.textImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+
+  gl.uniformli(u_Sampler0, 0);
+
+  console.log("Texture Loaded");
+}
+
+// Functions to load canvas and draw 3D Model =============================================================================
 function main() {
 
   // Set up canvas and gl vars 
@@ -155,8 +230,6 @@ function convertCoordinatesEventToGL(ev) {
 
 // Draw every shape that is supposed to be in the canvas
 function renderAllShapes() {
-  let startTime = performance.now();
-
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   // Pass matrix to rotate camera angle
@@ -172,11 +245,18 @@ function renderAllShapes() {
 
   buildLegs();
 
-  var duration = performance.now() - startTime;
-  sendTextToHTML (" ms: " + Math.floor(duration) + " fps: " + Math.floor(10000 / duration), "numdot");
-
 }
 
+function tick() {
+    stats.begin();
+    renderAllShapes();
+    stats.end();
+
+    requestAnimationFrame(tick);
+}
+
+
+// Functions that build the 3D Blocky Animal ===============================================================================
 function buildHead() {
   // Broque Monsieur's Head
   const head = new Cube();
@@ -393,24 +473,5 @@ function buildArms() {
   rightHand.matrix.scale(0.1, 0.1, 0.1);
   rightHand.render();
 
-
-}
-
-function tick() {
-    stats.begin();
-    renderAllShapes();
-    stats.end();
-
-    requestAnimationFrame(tick);
-}
-
-function sendTextToHTML(text, htmlID) {
-  let htmlElm = document.getElementById(htmlID);
-  if (!htmlElm) {
-    console.log("Failed to get " + htmlID + " from HTML");
-    return;
-  }
-
-  htmlElm.innerHTML = text;
 
 }

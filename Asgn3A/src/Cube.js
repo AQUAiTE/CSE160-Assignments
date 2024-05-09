@@ -6,18 +6,24 @@ class Cube {
         this.buffer = null;
         this.vertices = 
         [
-            [-1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0],
+            // Front Side
             [-1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0],
             [-1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0],
+            // Top Side
             [-1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0],
             [-1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+            // Bottom Side
             [-1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0],
             [-1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0],
+            // Right Side
             [-1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0],
             [1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0],
+            // Left Side
             [1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0],
             [-1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0],
-            [-1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0]
+            // Back Side
+            [-1.0, -1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0],
+            [-1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0]
         ];
     };
 
@@ -40,20 +46,13 @@ class Cube {
         gl.uniformMatrix4fv(u_ModelMatrix, false, this.matrix.elements);
 
         // Draw and slightly change color for better visibility (fake lighting)
-        let colorMod = 1.0;
+        let evenColor = [0,0, 1,1, 1,0];
+        let oddColor = [0,0, 0,1, 1,1];
         for (let i = 0; i < 12; i++) {
-            gl.uniform4f(u_FragColor, rgba[0]*colorMod, rgba[1]*colorMod, rgba[2]*colorMod, rgba[3]);
-            drawTriangle3D(this.vertices[i], this.buffer);
-            if (i == 3 || i == 4) {
-                colorMod = 0.8;
-            }
-            else if (i == 9 || i == 10) {
-                colorMod = 0.8;
-            }
-            else if (i == 7 || i == 8) {
-                colorMod = 0.6;
+            if (i % 2 == 0) {
+                drawTriangle3DUV(this.vertices[i], evenColor);
             } else {
-                colorMod = 1.0;
+                drawTriangle3DUV(this.vertices[i], oddColor);
             }
         }
 
