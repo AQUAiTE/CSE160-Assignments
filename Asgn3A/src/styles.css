@@ -34,10 +34,23 @@ input[type="button"], input[type="range"] {
 
 #comments {
     display: flex;
-    width: 200px;
+    width: 300px;
     padding: 20px;
     position: fixed;
     right: 100px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: #bba232;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#notes {
+    display: flex;
+    width: 250px;
+    padding: 20px;
+    position: fixed;
+    right: 475px;
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;

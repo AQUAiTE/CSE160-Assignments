@@ -254,7 +254,7 @@ function loadTexture(image0, image1, image2) {
   gl.uniform1i(u_Sampler2, 2);
 }
 
-// Functions to load canvas and draw 3D Model =============================================================================
+// Main Function  to load canvas and draw 3D Model =============================================================================
 function main() {
 
   // Set up canvas and gl vars 
@@ -278,15 +278,7 @@ function main() {
   tick()
 }
 
-var g_shapesList = [];
-
 // Handling Events =======================================================================================================
-
-function handleClearEvent() {
-  g_shapesList = [];
-  renderAllShapes();
-}
-
 // Extract event click and return it in WebGL coords
 function convertCoordinatesEventToGL(ev) {
   let x = ev.clientX; // x coordinate of a mouse pointer
@@ -331,7 +323,6 @@ function updateCamera() {
   gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMatrix.elements);
 }
 
-// Draw every shape that is supposed to be in the canvas
 function renderAllShapes() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -391,12 +382,11 @@ function buildSky() {
 function buildGround() {
   const ground = new Cube();
   ground.color = [0.0, 0.6, 0.4, 1.0];
-  ground.matrix.translate(0, -0.4, 0.0);
+  ground.matrix.translate(0, -0.6, 0.0);
   ground.matrix.scale(10, 0, 10);
   ground.matrix.translate(-0.5, 0.0, -0.5);
   ground.render();
 }
-
 
 // Functions that build the 3D Blocky Animal ===============================================================================
 function buildHead() {
