@@ -57,7 +57,7 @@ let u_texColorWeight;
 
 
 // UI Global Vars
-let g_globalAngle = [0, 0];
+let g_globalAngle = [132, 0];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
@@ -214,7 +214,7 @@ function initTextures() {
   }
 
   image2.onload = function() { loadTexture(image0, image1, image2); };
-  image0.src = '../assets/StonePath.png';
+  image0.src = '../assets/64Mountains.png';
   image1.src = '../assets/64SeaClouds.png'
   image2.src = '../assets/PinkShrooms.png';
 
@@ -360,14 +360,14 @@ function renderAllShapes() {
   buildHead();
 
   // Use the Mountain Image
-  //gl.uniform1i(u_TextureUnit, 0);
-  //buildBody();
+  gl.uniform1i(u_TextureUnit, 0);
+  buildBody();
 
-  //buildArms();
+  buildArms();
 
   // Use the base color
-  //gl.uniform1f(u_texColorWeight, 0.0);
-  //buildLegs();
+  gl.uniform1f(u_texColorWeight, 0.0);
+  buildLegs();
 
 }
 
@@ -403,7 +403,7 @@ function buildHead() {
   // Broque Monsieur's Head
   const head = new Cube();
   head.color = [0.98, 0.905, 0.3, 1.0];
-  head.matrix.setTranslate(-0.1, 0.2, -0.9);
+  head.matrix.setTranslate(0.0, 0.5, 0.0);
   head.matrix.scale(0.3, 0.3, 0.3);
   head.render();
 
@@ -558,7 +558,7 @@ function buildLegs() {
 function buildArms() {
   const leftArm = new Cube();
   leftArm.color = [0.0, 0.0, 0.0, 1.0];
-  leftArm.matrix.setTranslate(0.28, 0.125, 0.0);
+  leftArm.matrix.setTranslate(0.17, 0.125, 0.0);
   leftArm.matrix.translate(-0.1, 0.05, 0.0);
   leftArm.matrix.rotate(g_leftAngles[0], 0, 1, 0);
   leftArm.matrix.rotate(g_leftAngles[1], 0, 0, 1);
@@ -570,7 +570,7 @@ function buildArms() {
   const forearmL = new Cube();
   forearmL.color = [1.0, 0.0, 0.0, 1.0];
   forearmL.matrix = leftArmCoords;
-  forearmL.matrix.translate(0.2, 0.0, 0.0);
+  forearmL.matrix.translate(0.1, 0.0, 0.0);
   forearmL.matrix.translate(-0.1, 0.05, 0.0);
   forearmL.matrix.rotate(g_leftAngles[2], 0, 0, 1);
   forearmL.matrix.translate(0.1, -0.05, 0.0);
@@ -582,7 +582,7 @@ function buildArms() {
   const leftHand = new Cube();
   leftHand.color = [1.0, 1.0, 1.0, 1.0];
   leftHand.matrix = forearmLCoords;
-  leftHand.matrix.translate(0.2, 0.0, 0.0);
+  leftHand.matrix.translate(0.1, 0.0, 0.0);
   leftHand.matrix.scale(0.1, 0.1, 0.1);
   leftHand.render();
 
