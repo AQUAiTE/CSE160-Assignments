@@ -21,6 +21,7 @@ var FSHADER_SOURCE = `
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
   uniform sampler2D u_Sampler1;
+  uniform sampler2D u_Sampler2;
   uniform int u_TextureUnit;
   uniform float u_texColorWeight;
   void main() {
@@ -28,8 +29,11 @@ var FSHADER_SOURCE = `
     vec4 texColor;
     if (u_TextureUnit == 0) {
       texColor = texture2D(u_Sampler0, v_UV);
-    } else {
+    }
+    else if (u_TextureUnit == 1) {
       texColor = texture2D(u_Sampler1, v_UV);
+    } else {
+      texColor = texture2D(u_Sampler2, v_UV);
     }
     // Final Color/Texture Set Based on texColorWeight
     gl_FragColor = (1.0 - u_texColorWeight) * u_FragColor + u_texColorWeight * texColor;
@@ -47,6 +51,7 @@ let u_ProjectionMatrix;
 let u_ViewMatrix;
 let u_Sampler0;
 let u_Sampler1;
+let u_Sampler2;
 let u_TextureUnit;
 let u_texColorWeight;
 
@@ -56,6 +61,7 @@ let g_globalAngle = [0, 0];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
+let g_camera;
 
 // Animation Global Vars 
 // *Note: Holdover from previous assignment, breaks the model w/o it
@@ -163,6 +169,13 @@ function connectVariablesToGLSL() {
     return;
   } 
 
+  // Get the storage location of u_Sampler2
+  u_Sampler2 = gl.getUniformLocation(gl.program, 'u_Sampler2');
+  if (!u_Sampler2) {
+    console.log('Failed to get the storage location of u_Sampler2');
+    return;
+  } 
+
   // Get the storage location of u_TextureUnit
   u_TextureUnit = gl.getUniformLocation(gl.program, 'u_TextureUnit');
   if (!u_TextureUnit) {
@@ -194,22 +207,25 @@ function addActionsForHtmlUI() {
 function initTextures() {
   var image0 = new Image();
   var image1 = new Image();
-  if (!image0 || !image1) {
+  var image2 = new Image();
+  if (!image0 || !image1 || !image2) {
     console.log('Failed to create the image object');
     return false;
   }
 
-  image1.onload = function() { loadTexture(image0, image1); };
-  image0.src = '../assets/PinkShrooms.png';
-  image1.src = 'sky.jpg'
+  image2.onload = function() { loadTexture(image0, image1, image2); };
+  image0.src = '../assets/StonePath.png';
+  image1.src = '../assets/64SeaClouds.png'
+  image2.src = '../assets/PinkShrooms.png';
 
   return true;
 }
 
-function loadTexture(image0, image1) {
+function loadTexture(image0, image1, image2) {
   var texture0 = gl.createTexture();
   var texture1 = gl.createTexture();
-  if (!texture0 || !texture1) {
+  var texture2 = gl.createTexture();
+  if (!texture0 || !texture1 || !texture2) {
     console.log('Failed to create the texture object');
     return false;
   }
@@ -229,6 +245,13 @@ function loadTexture(image0, image1) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image1);
   gl.uniform1i(u_Sampler1, 1);
+
+  // Set up texture for image2
+  gl.activeTexture(gl.TEXTURE2);
+  gl.bindTexture(gl.TEXTURE_2D, texture2);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image2);
+  gl.uniform1i(u_Sampler2, 2);
 }
 
 // Functions to load canvas and draw 3D Model =============================================================================
@@ -245,6 +268,9 @@ function main() {
 
   initTextures();
 
+  g_camera = new Camera();
+  updateCamera();
+
   // Specify the color for clearing <canvas>
   gl.clearColor(0.53, 0.87, 0.98, 1.0);
 
@@ -253,6 +279,8 @@ function main() {
 }
 
 var g_shapesList = [];
+
+// Handling Events =======================================================================================================
 
 function handleClearEvent() {
   g_shapesList = [];
@@ -271,15 +299,45 @@ function convertCoordinatesEventToGL(ev) {
   return([x,y]);
 }
 
+function keydown(ev) {
+  switch (ev.keyCode) {
+    case 65: // A
+      g_camera.moveLeft();
+      break;
+    case 68: // D
+      g_camera.moveRight();
+      break;
+    case 87: // W
+      g_camera.moveForward();
+      break;
+    case 83: // S
+      g_camera.moveBackwards();
+      break;
+    case 69: // E
+      g_camera.panRight();
+      break;
+    case 81: // Q
+      g_camera.panLeft();
+      break;
+    default: return;
+  }
+  renderAllShapes();
+  console.log("Hitting keycode: " + ev.keyCode);
+
+}
+
+function updateCamera() {
+  gl.uniformMatrix4fv(u_ProjectionMatrix, false, g_camera.projMatrix.elements);
+  gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMatrix.elements);
+}
+
 // Draw every shape that is supposed to be in the canvas
 function renderAllShapes() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  var projMatrix = new Matrix4();
-  gl.uniformMatrix4fv(u_ProjectionMatrix, false, projMatrix.elements);
+  document.onkeydown = keydown.bind(g_camera);
 
-  var viewMatrix = new Matrix4();
-  gl.uniformMatrix4fv(u_ViewMatrix, false, viewMatrix.elements);
+  updateCamera();
 
   // Pass matrix to rotate camera angle
   let globalRotMatrix = new Matrix4().rotate(g_globalAngle[0], 0, 1, 0);
@@ -293,11 +351,11 @@ function renderAllShapes() {
   buildSky();
 
   gl.uniform1i(u_TextureUnit, 0);
+  gl.uniform1f(u_texColorWeight, 0.0);
   buildGround();
 
-  
-  // BROQUE MONSIEUR: REMOVED FOR NOW
-  // Use the texture
+  // Use the texture PinkShrooms
+  gl.uniform1i(u_TextureUnit, 2);
   gl.uniform1f(u_texColorWeight, 1.0);
   buildHead();
 
@@ -332,8 +390,10 @@ function buildSky() {
 
 function buildGround() {
   const ground = new Cube();
-  ground.color = [0.0, 0.0, 0.0, 1.0];
-  ground.matrix.scale(100, 0, 100);
+  ground.color = [0.0, 0.6, 0.4, 1.0];
+  ground.matrix.translate(0, -0.4, 0.0);
+  ground.matrix.scale(10, 0, 10);
+  ground.matrix.translate(-0.5, 0.0, -0.5);
   ground.render();
 }
 
@@ -343,7 +403,7 @@ function buildHead() {
   // Broque Monsieur's Head
   const head = new Cube();
   head.color = [0.98, 0.905, 0.3, 1.0];
-  head.matrix.setTranslate(0.0, .5, 0.0);
+  head.matrix.setTranslate(-0.1, 0.2, -0.9);
   head.matrix.scale(0.3, 0.3, 0.3);
   head.render();
 
