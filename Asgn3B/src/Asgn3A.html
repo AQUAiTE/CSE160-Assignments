@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Virtual World 3A</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+
+  <body onload="main()">
+    <div id="container">
+      <canvas id="webgl" width="400" height="400">
+        Please use a browser that supports "canvas"
+      </canvas>
+      <div id="sidePanel">
+        Camera Controls:
+        <br>
+        <div>
+          <label for="cameraX">X:</label>
+          <input type="range" id="cameraX" min="0" max="360" class="slider" value="25">
+          <br>
+          <label for="cameraY">Y:</label>
+          <input type="range" id="cameraY" min="0" max="360" class="slider" value="0">
+        </div>
+        
+      </div>
+
+      <div id="notes">
+        My Info and Notes to Grader:
+        <ul>
+          <li>Name: Matthew Solomon</li>
+          <br>
+          <li>Email: fsolomon@ucsc.edu</li>
+          <br>
+          <li>I have everything for 3A here: Skybox, Ground, Multiple Textures + Colors</li>
+          <br>
+          <li>My blocky animal got detached when I worked on the uv coords and skybox/ground. I will fix him later, but for now it's good enough to help show I have the rubric points.</li>
+        </ul>
+      </div>
+
+      <div id="comments">
+        Citations:
+        <ul>
+          <li><a href="https://www.textures-resource.com/nintendo_64/mario64/">Textures from Super Mario 64</a></li>
+            <ul>
+              <li>All rights reserved to the copyright of Nintendo Co., Ltd. Textures will be removed and swapped for license-free textures by request. This is for personal use
+              and educational purposes only.
+              </li>
+            </ul>
+          <li><a href="https://www.spriters-resource.com/ds_dsi/marioandluigi3/">Sprites from Mario & Luigi: Bowser's Inside Story</a></li>
+            <ul>
+              <li>All rights once again reserved to Nintendo Co., Ltd. I cropped the design from a sprite and resized it.</li>
+            </ul>
+          <li><a href="https://www.youtube.com/playlist?list=PLbyTU_tFIkcOs7XVopOy5Oti-HGiIZx0J">Professor Davis' Walkthrough Helper</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!--Buttons/Sliders-->
+  
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+    <script src="../node_modules/stats.js/build/stats.min.js"></script>
+    <script src="Camera.js"></script>
+    <script src="Triangle.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Cylinder.js"></script>
+    <script src="World.js"></script>
+  </body>
+</html>
