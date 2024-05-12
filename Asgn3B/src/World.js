@@ -6,11 +6,11 @@ var VSHADER_SOURCE = `
   attribute vec2 a_UV;
   varying vec2 v_UV;
   uniform mat4 u_ModelMatrix;
-  uniform mat4 u_GlobalRotateMatrix;
+  //uniform mat4 u_GlobalRotateMatrix;
   uniform mat4 u_ViewMatrix;
   uniform mat4 u_ProjectionMatrix;
   void main() {
-    gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
+    gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * a_Position;
     v_UV = a_UV;
   }`
 
@@ -46,7 +46,7 @@ let a_Position;
 let a_UV;
 let u_FragColor;
 let u_ModelMatrix;
-let u_GlobalRotateMatrix;
+//let u_GlobalRotateMatrix;
 let u_ProjectionMatrix;
 let u_ViewMatrix;
 let u_Sampler0;
@@ -135,11 +135,11 @@ function connectVariablesToGLSL() {
   }
 
   // Get the storage location of u_GlobalRotateMatrix
-  u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, 'u_GlobalRotateMatrix');
-  if (!u_GlobalRotateMatrix) {
-    console.log('Failed to get the storage location of u_GlobalRotateMatrix');
-    return;
-  }
+  //u_GlobalRotateMatrix = gl.getUniformLocation(gl.program, 'u_GlobalRotateMatrix');
+  //if (!u_GlobalRotateMatrix) {
+  //  console.log('Failed to get the storage location of u_GlobalRotateMatrix');
+  //  return;
+ // }
 
   // Get the storage location of u_ProjectionMatrix
   u_ProjectionMatrix = gl.getUniformLocation(gl.program, 'u_ProjectionMatrix');
@@ -295,26 +295,30 @@ function keydown(ev) {
   switch (ev.keyCode) {
     case 65: // A
       g_camera.moveLeft();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 68: // D
       g_camera.moveRight();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 87: // W
       g_camera.moveForward();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 83: // S
       g_camera.moveBackwards();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 69: // E
       g_camera.panRight();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 81: // Q
       g_camera.panLeft();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     default: return;
   }
-  renderAllShapes();
-  console.log("Hitting keycode: " + ev.keyCode);
 
 }
 
@@ -326,14 +330,11 @@ function updateCamera() {
 function renderAllShapes() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  document.onkeydown = keydown.bind(g_camera);
-
-  updateCamera();
 
   // Pass matrix to rotate camera angle
-  let globalRotMatrix = new Matrix4().rotate(g_globalAngle[0], 0, 1, 0);
-  globalRotMatrix.rotate(g_globalAngle[1], 1, 0, 0);
-  gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMatrix.elements);
+  //let globalRotMatrix = new Matrix4().rotate(g_globalAngle[0], 0, 1, 0);
+ // globalRotMatrix.rotate(g_globalAngle[1], 1, 0, 0);
+  //gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMatrix.elements);
 
   // Use the Sea and Clouds Image
   gl.uniform1i(u_TextureUnit, 1);
@@ -364,6 +365,8 @@ function renderAllShapes() {
 
 function tick() {
     stats.begin();
+    document.onkeydown = keydown.bind(g_camera);
+    updateCamera();
     renderAllShapes();
     stats.end();
 
