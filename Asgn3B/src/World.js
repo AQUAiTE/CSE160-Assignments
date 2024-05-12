@@ -548,7 +548,7 @@ function buildLegs() {
 function buildArms() {
   const leftArm = new Cube();
   leftArm.color = [0.0, 0.0, 0.0, 1.0];
-  leftArm.matrix.setTranslate(0.17, 0.125, 0.0);
+  leftArm.matrix.setTranslate(0.28, 0.125, 0.0);
   leftArm.matrix.translate(-0.1, 0.05, 0.0);
   leftArm.matrix.rotate(g_leftAngles[0], 0, 1, 0);
   leftArm.matrix.rotate(g_leftAngles[1], 0, 0, 1);
@@ -560,7 +560,7 @@ function buildArms() {
   const forearmL = new Cube();
   forearmL.color = [1.0, 0.0, 0.0, 1.0];
   forearmL.matrix = leftArmCoords;
-  forearmL.matrix.translate(0.1, 0.0, 0.0);
+  forearmL.matrix.translate(0.2, 0.0, 0.0);
   forearmL.matrix.translate(-0.1, 0.05, 0.0);
   forearmL.matrix.rotate(g_leftAngles[2], 0, 0, 1);
   forearmL.matrix.translate(0.1, -0.05, 0.0);
