@@ -2,7 +2,7 @@ class Camera {
   constructor() {
     this.type = 'camera';
     this.fov = 60.0;
-    this.eye = new Vector3([0.0, 0, 0]);
+    this.eye = new Vector3([10, 0, 3.5]);
     this.at = new Vector3([0, 0, -1]);
     this.up = new Vector3([0, 1, 0]);
 
@@ -23,7 +23,6 @@ class Camera {
       this.at.elements[0], this.at.elements[1], this.at.elements[2],
       this.up.elements[0], this.up.elements[1], this.up.elements[2]
     );
-    console.log("Eye: " + this.eye.elements[0]);
   }
   
   moveForward() {
@@ -35,6 +34,7 @@ class Camera {
     this.eye.add(f);
     this.at.add(f);
     this.updateViewMatrix();
+    console.log(this.eye.elements[0]);
   }
 
   moveBackwards() {
