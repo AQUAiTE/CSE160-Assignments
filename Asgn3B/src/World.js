@@ -214,7 +214,7 @@ function initTextures() {
   }
 
   image2.onload = function() { loadTexture(image0, image1, image2); };
-  image0.src = '../assets/64Mountains.png';
+  image0.src = '../assets/castleWalls.png';
   image1.src = '../assets/64SeaClouds.png'
   image2.src = '../assets/PinkShrooms.png';
 
@@ -295,26 +295,30 @@ function keydown(ev) {
   switch (ev.keyCode) {
     case 65: // A
       g_camera.moveLeft();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 68: // D
       g_camera.moveRight();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 87: // W
       g_camera.moveForward();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 83: // S
       g_camera.moveBackwards();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 69: // E
       g_camera.panRight();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 81: // Q
       g_camera.panLeft();
+      console.log("Hitting keycode: " + ev.keyCode);
       break;
     default: return;
   }
-  renderAllShapes();
-  console.log("Hitting keycode: " + ev.keyCode);
 
 }
 
@@ -326,9 +330,6 @@ function updateCamera() {
 function renderAllShapes() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  document.onkeydown = keydown.bind(g_camera);
-
-  updateCamera();
 
   // Pass matrix to rotate camera angle
   let globalRotMatrix = new Matrix4().rotate(g_globalAngle[0], 0, 1, 0);
@@ -341,17 +342,12 @@ function renderAllShapes() {
   gl.uniform1f(u_texColorWeight, 1.0);
   buildSky();
 
-  gl.uniform1i(u_TextureUnit, 0);
   gl.uniform1f(u_texColorWeight, 0.0);
   buildGround();
 
-  // Use the texture PinkShrooms
-  gl.uniform1i(u_TextureUnit, 2);
-  gl.uniform1f(u_texColorWeight, 1.0);
+  // Use Default Color
   buildHead();
 
-  // Use the Mountain Image
-  gl.uniform1i(u_TextureUnit, 0);
   buildBody();
 
   buildArms();
@@ -360,10 +356,17 @@ function renderAllShapes() {
   gl.uniform1f(u_texColorWeight, 0.0);
   buildLegs();
 
+  // Use Castle Walls Texture
+  gl.uniform1i(u_TextureUnit, 0);
+  gl.uniform1f(u_texColorWeight, 1.0);
+  buildMap();
+
 }
 
 function tick() {
     stats.begin();
+    document.onkeydown = keydown.bind(g_camera);
+    updateCamera();
     renderAllShapes();
     stats.end();
 
@@ -374,7 +377,7 @@ function tick() {
 function buildSky() {
   const sky = new Cube();
   sky.color = [0.5, 0.5, 1.0, 1.0];
-  sky.matrix.scale(2, 2, 2);
+  sky.matrix.scale(35, 35, 35);
   sky.matrix.translate(-0.5, -0.5, -0.5);
   sky.render();
 }
@@ -382,10 +385,73 @@ function buildSky() {
 function buildGround() {
   const ground = new Cube();
   ground.color = [0.0, 0.6, 0.4, 1.0];
-  ground.matrix.translate(0, -0.6, 0.0);
-  ground.matrix.scale(10, 0, 10);
+  ground.matrix.translate(0, -0.1, 0.0);
+  ground.matrix.scale(35, 0, 35);
   ground.matrix.translate(-0.5, 0.0, -0.5);
   ground.render();
+}
+
+
+// Map Key
+// 0 = No Wall
+// 1 = Black Wall
+// 2 = Pink Shroom Block
+
+let map = [
+  // Opposite Corner
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], // Top Left Corner
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] 
+  // Right Corner                                                                                 // Starting Corner
+];
+function buildMap() {
+  for (x = 0; x < 32; x++) {
+    for (z = 0; z < 32; z++) {
+      let scale = 0.3;
+      gl.uniform1i(u_TextureUnit, 0);
+      if (map[x][z] != 0) {
+        if (map[x][z] == 2) { 
+          gl.uniform1i(u_TextureUnit, 2);
+          scale = 0.15;
+        }
+        let wall = new Cube();
+        wall.color = [0.0, 0.0, 0.0, 1.0];
+        wall.matrix.translate(0.0, -0.1, 0.0);
+        wall.matrix.scale(scale, scale, scale);
+        wall.matrix.translate(x-5, 0.0, z-5);
+        wall.render();
+      }
+    }
+  }
 }
 
 // Functions that build the 3D Blocky Animal ===============================================================================
@@ -548,7 +614,7 @@ function buildLegs() {
 function buildArms() {
   const leftArm = new Cube();
   leftArm.color = [0.0, 0.0, 0.0, 1.0];
-  leftArm.matrix.setTranslate(0.17, 0.125, 0.0);
+  leftArm.matrix.setTranslate(0.28, 0.125, 0.0);
   leftArm.matrix.translate(-0.1, 0.05, 0.0);
   leftArm.matrix.rotate(g_leftAngles[0], 0, 1, 0);
   leftArm.matrix.rotate(g_leftAngles[1], 0, 0, 1);
@@ -560,7 +626,7 @@ function buildArms() {
   const forearmL = new Cube();
   forearmL.color = [1.0, 0.0, 0.0, 1.0];
   forearmL.matrix = leftArmCoords;
-  forearmL.matrix.translate(0.1, 0.0, 0.0);
+  forearmL.matrix.translate(0.2, 0.0, 0.0);
   forearmL.matrix.translate(-0.1, 0.05, 0.0);
   forearmL.matrix.rotate(g_leftAngles[2], 0, 0, 1);
   forearmL.matrix.translate(0.1, -0.05, 0.0);
