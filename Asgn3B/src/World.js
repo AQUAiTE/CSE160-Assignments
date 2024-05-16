@@ -73,6 +73,7 @@ let g_flipStacheY = 0.0;
 let g_browRotate = 7;
 let g_browMoveX = 0.0;
 let g_browMoveY = 0.0;
+let g_currentBlocks = [];
 
 // Performance Monitor
 var stats = new Stats();
@@ -212,19 +213,6 @@ function addActionsForHtmlUI() {
   document.addEventListener('pointerlockchange', lockAlert, false);
 }
 
-function lockAlert() {
-  if (document.pointerLockElement == canvas) {
-    document.onmousemove = (ev) => lookAround(ev);
-  } else {
-    document.onmousemove = null;
-  }
-}
-
-function lookAround(ev) {
-  g_camera.horizontalPan(ev.movementX * 0.1);
-  g_camera.verticalPan(ev.movementY * 0.1);
-}
-
 function initTextures() {
   var image0 = new Image();
   var image1 = new Image();
@@ -237,7 +225,7 @@ function initTextures() {
   image2.onload = function() { loadTexture(image0, image1, image2); };
   image0.src = '../assets/castleWalls.png';
   image1.src = '../assets/64SeaClouds.png'
-  image2.src = '../assets/PinkShrooms.png';
+  image2.src = '../assets/questionBlock.png';
 
   return true;
 }
@@ -348,6 +336,46 @@ function updateCamera() {
   gl.uniformMatrix4fv(u_ViewMatrix, false, g_camera.viewMatrix.elements);
 }
 
+function lockAlert() {
+  if (document.pointerLockElement == canvas) {
+    document.onmousemove = (ev) => lookAround(ev);
+    document.onclick = (ev) => blockController(ev);
+  } else {
+    document.onmousemove = null;
+  }
+}
+
+function lookAround(ev) {
+  g_camera.horizontalPan(ev.movementX * 0.1);
+  g_camera.verticalPan(ev.movementY * 0.1);
+}
+
+function blockController(ev) {
+  let x  = Math.round(g_camera.at.elements[0]) + 16.1;
+  let y = Math.round(g_camera.at.elements[1]) - 0.1;
+  let z = Math.round(g_camera.at.elements[2]) + 16.1;
+
+  if (x < 0) {
+    worldFactor 
+  }
+
+  // Destroy Box
+  if (ev.button == 0) {
+    g_currentBlocks[x * y * z + 1] = null;
+  } else if (ev.button == 2) {
+    if (g_currentBlocks[x * y * z + 1]) {
+      return;
+    }
+
+    let block = new Cube();
+    block.matrix.translate(x - 16.1, y + 0.1, z - 16.1);
+    console.log(x - 16, " ", y, " ", z - 16);
+    console.log(g_camera.at.elements[0], " ", g_camera.at.elements[1], " ", g_camera.at.elements[2])
+    block.matrix.scale(1, 1, 1);
+    g_currentBlocks[x * y * z + 1] = block;
+  }
+}
+
 function renderAllShapes() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -393,6 +421,7 @@ function tick() {
 
     requestAnimationFrame(tick);
 }
+
 
 // Build the Sky and Ground ================================================================================================
 function buildSky() {
@@ -464,14 +493,21 @@ function buildMap() {
         if (map[x][z] == 2) { 
           gl.uniform1i(u_TextureUnit, 2);
           wall.matrix.scale(0.15, 0.15, 0.15);
-          wall.matrix.translate((x-5)*2, 0.0, (z-5)*2);
+          wall.matrix.translate((x-16)*2, 0.0, (z-16)*2);
           wall.render();
         } else {
-          wall.matrix.scale(0.3, 0.3, 0.3);
-          wall.matrix.translate(x-5, 0.0, z-5);
+          wall.matrix.scale(0.3, 0.6, 0.3);
+          wall.matrix.translate(x-16, 0.0, z-16);
           wall.render();
         }
       }
+    }
+  }
+
+  for (let index in g_currentBlocks) {
+    if (g_currentBlocks[index]) {
+      gl.uniform1i(u_TextureUnit, 2);
+      g_currentBlocks[index].render();
     }
   }
 }
@@ -481,36 +517,41 @@ function buildHead() {
   // Broque Monsieur's Head
   const head = new Cube();
   head.color = [0.98, 0.905, 0.3, 1.0];
-  head.matrix.setTranslate(0.0, 0.5, 0.0);
+  head.matrix.setTranslate(0.0, 0.4, 0.0);
+  head.matrix.translate(-0.06, -0.05, -0.15);
   head.matrix.scale(0.3, 0.3, 0.3);
   head.render();
 
-  /*// Left Eyeball
+  // Left Eyeball
   const leftEye = new Cylinder();
   leftEye.color = [1.0, 1.0, 1.0, 1.0];
   leftEye.matrix.setTranslate(0.125, 0.55, -0.35);
-  leftEye.matrix.scale(0.35, 0.55, 0.05);
+  leftEye.matrix.translate(0.03, -0.05, 0.17);
+  leftEye.matrix.scale(0.175, 0.275, 0.025);
   leftEye.render();
 
   // Right Eyeball
   const rightEye = new Cylinder();
   rightEye.color = [1.0, 1.0, 1.0, 1.0];
   rightEye.matrix.setTranslate(-0.125, 0.55, -0.35);
-  rightEye.matrix.scale(0.35, 0.55, 0.05);
+  rightEye.matrix.translate(0.15, -0.05, 0.17);
+  rightEye.matrix.scale(0.175, 0.275, 0.025);
   rightEye.render();
 
   // Left Pupil
   const leftPupil = new Cylinder();
   leftPupil.color = [0.0, 0.0, 0.0, 1.0];
   leftPupil.matrix.setTranslate(0.125, 0.55, -0.36);
-  leftPupil.matrix.scale(0.175, 0.275, 0.025);
+  leftPupil.matrix.translate(0.03, -0.05, 0.17);
+  leftPupil.matrix.scale(0.175 * 0.5, 0.275 * 0.5, 0.025 * 0.5);
   leftPupil.render();
 
   // Right Pupil
   const rightPupil = new Cylinder();
   rightPupil.color = [0.0, 0.0, 0.0, 1.0];
   rightPupil.matrix.setTranslate(-0.125, 0.55, -0.36);
-  rightPupil.matrix.scale(0.175, 0.275, 0.025);
+  rightPupil.matrix.translate(0.15, -0.05, 0.17);
+  rightPupil.matrix.scale(0.175 * 0.5, 0.275 * 0.5, 0.025 * 0.5);
   rightPupil.render();
 
   // Right Eyebrow
@@ -519,6 +560,7 @@ function buildHead() {
   rightBrow.matrix.setTranslate(-0.15, 0.705, -0.31);
   rightBrow.matrix.translate(g_browMoveX, g_browMoveY, 0.0);
   rightBrow.matrix.translate(0, g_eyebrowR, 0)
+  rightBrow.matrix.translate(0.11, -.13, 0.15);
   rightBrow.matrix.rotate(g_browRotate, 0, 0, 1);
   rightBrow.matrix.scale(0.1, 0.022, 0.02);
   rightBrow.render();
@@ -529,6 +571,7 @@ function buildHead() {
   leftBrow.matrix.setTranslate(0.15, 0.705, -0.31);
   leftBrow.matrix.translate(-g_browMoveX, -g_browMoveY, 0.0);
   leftBrow.matrix.translate(0, g_eyebrowL, 0);
+  leftBrow.matrix.translate(-0.04, -.12, 0.15);
   leftBrow.matrix.rotate(-g_browRotate, 0, 0, 1);
   leftBrow.matrix.scale(0.1, 0.022, 0.02);
   leftBrow.render();
@@ -537,6 +580,7 @@ function buildHead() {
   const rightStache = new Cube();
   rightStache.color = [0.0, 0.0, 0.0, 1.0];
   rightStache.matrix.setTranslate(-0.075, 0.37, -0.31);
+  rightStache.matrix.translate(0.085, -.06, 0.15);
   rightStache.matrix.translate(g_flipStacheX, g_flipStacheY, 0.0);
   rightStache.matrix.translate(0, -g_moustacheHt, 0);
   rightStache.matrix.rotate(45, 0, 0, 1);
@@ -547,12 +591,13 @@ function buildHead() {
   const leftStache = new Cube();
   leftStache.color = [0.0, 0.0, 0.0, 1.0];
   leftStache.matrix.setTranslate(0.075, 0.37, -0.31);
+  leftStache.matrix.translate(-0.015, 0.06, 0.15);
   leftStache.matrix.translate(-g_flipStacheX, g_flipStacheY, 0.0);
   leftStache.matrix.translate(0, -g_moustacheHt, 0);
   leftStache.matrix.rotate(-45, 0, 0, 1);
   leftStache.matrix.translate(0.0, 0.0, 0.0);
   leftStache.matrix.scale(0.15, 0.05, 0.02);
-  leftStache.render();*/
+  leftStache.render();
 }
 
 function buildBody() {
@@ -560,6 +605,7 @@ function buildBody() {
   const body = new Cube();
   body.color = [0.98, 0.85, 0.0, 1.0];
   body.matrix.setTranslate(0.0, 0.05, 0.0);
+  body.matrix.translate(0.0, 0.1, 0.0);
   body.matrix.scale(0.18, 0.24, 0.18);
   body.render();
 
@@ -567,18 +613,21 @@ function buildBody() {
   const middleBow = new Cylinder();
   middleBow.color = [1.0, 0.0, 0.0, 1.0];
   middleBow.matrix.setTranslate(0.0, 0.13, -0.2);
-  middleBow.matrix.scale(0.2, 0.25, 0.03);
+  middleBow.matrix.translate(0.09, 0.175, 0.19);
+  middleBow.matrix.scale(0.2*.5, 0.25*.5, 0.03*.5);
   middleBow.render();
 
   const leftBow = new Cube();
   leftBow.color = [0.8, 0.0, 0.0, 1.0];
   leftBow.matrix.setTranslate(-0.07, 0.13, -0.2);
+  leftBow.matrix.translate(0.09, 0.15, 0.19);
   leftBow.matrix.scale(0.05, 0.05, 0.03);
   leftBow.render();
 
   const rightBow = new Cube();
   rightBow.color = [0.8, 0.0, 0.0, 1.0];
   rightBow.matrix.setTranslate(0.07, 0.13, -0.2);
+  rightBow.matrix.translate(0.04, 0.15, 0.19);
   rightBow.matrix.scale(0.05, 0.05, 0.03);
   rightBow.render();
   
@@ -590,6 +639,7 @@ function buildLegs() {
   const leftLeg = new Cube();
   leftLeg.color = [0.0, 0.0, 0.0, 1.0];
   leftLeg.matrix.setTranslate(-0.09, -0.25, 0.05);
+  leftLeg.matrix.translate(0.1, 0.3, 0.05);
   leftLeg.matrix.scale(0.04, 0.1, 0.04);
   leftLeg.render();
 
@@ -597,6 +647,7 @@ function buildLegs() {
   const rightLeg = new Cube();
   rightLeg.color = [0.0, 0.0, 0.0, 1.0];
   rightLeg.matrix.setTranslate(0.09, -0.25, 0.05);
+  rightLeg.matrix.translate(0.025, 0.3, 0.05);
   rightLeg.matrix.scale(0.04, 0.1, 0.04);
   rightLeg.render();
 
@@ -604,6 +655,7 @@ function buildLegs() {
   const leftFt = new Cube();
   leftFt.color = [0.46, 0.247, 0.173, 0.9];
   leftFt.matrix.setTranslate(-0.1, -0.38, -0.01);
+  leftFt.matrix.translate(0.06, 0.38, 0.1);
   leftFt.matrix.rotate(30, 0, 1, 0);
   leftFt.matrix.scale(0.08, 0.07, 0.1);
   leftFt.render();
@@ -612,6 +664,7 @@ function buildLegs() {
   const rightFt = new Cube();
   rightFt.color = [0.46, 0.247, 0.173, 0.9];
   rightFt.matrix.setTranslate(0.1, -0.38, -0.01);
+  rightFt.matrix.translate(0.04, 0.38, 0.05);
   rightFt.matrix.rotate(-30, 0, 1, 0);
   rightFt.matrix.scale(0.08, 0.07, 0.1);
   rightFt.render();
@@ -620,6 +673,7 @@ function buildLegs() {
   const leftBase = new Cube();
   leftBase.color = [0.46, 0.247, 0.173, 1.0];
   leftBase.matrix.setTranslate(0.1, -0.47, -0.01);
+  leftBase.matrix.translate(0.04, 0.45, 0.05);
   leftBase.matrix.rotate(-30, 0, 1, 0);
   leftBase.matrix.scale(0.08, 0.02, 0.1);
   leftBase.render();
@@ -628,6 +682,7 @@ function buildLegs() {
   const rightBase = new Cube();
   rightBase.color = [0.46, 0.247, 0.173, 1.0];
   rightBase.matrix.setTranslate(-0.1, -0.47, -0.01);
+  rightBase.matrix.translate(0.06, 0.45, 0.1);
   rightBase.matrix.rotate(30, 0, 1, 0);
   rightBase.matrix.scale(0.08, 0.02, 0.1);
   rightBase.render();
@@ -637,7 +692,7 @@ function buildArms() {
   const leftArm = new Cube();
   leftArm.color = [0.0, 0.0, 0.0, 1.0];
   leftArm.matrix.setTranslate(0.28, 0.125, 0.0);
-  leftArm.matrix.translate(-0.1, 0.05, 0.0);
+  leftArm.matrix.translate(-0.2, 0.2, 0.0);
   leftArm.matrix.rotate(g_leftAngles[0], 0, 1, 0);
   leftArm.matrix.rotate(g_leftAngles[1], 0, 0, 1);
   leftArm.matrix.translate(0.1, -0.05, 0.0);
@@ -648,7 +703,7 @@ function buildArms() {
   const forearmL = new Cube();
   forearmL.color = [1.0, 0.0, 0.0, 1.0];
   forearmL.matrix = leftArmCoords;
-  forearmL.matrix.translate(0.2, 0.0, 0.0);
+  forearmL.matrix.translate(0.1, 0.0, 0.0);
   forearmL.matrix.translate(-0.1, 0.05, 0.0);
   forearmL.matrix.rotate(g_leftAngles[2], 0, 0, 1);
   forearmL.matrix.translate(0.1, -0.05, 0.0);
@@ -656,19 +711,17 @@ function buildArms() {
   forearmL.matrix.scale(0.1, 0.05, 0.05);
   forearmL.render();
 
-  gl.uniform1f(u_texColorWeight, 0.0);
   const leftHand = new Cube();
   leftHand.color = [1.0, 1.0, 1.0, 1.0];
   leftHand.matrix = forearmLCoords;
-  leftHand.matrix.translate(0.1, 0.0, 0.0);
+  leftHand.matrix.translate(0.1, -0.025, -0.025);
   leftHand.matrix.scale(0.1, 0.1, 0.1);
   leftHand.render();
 
-  gl.uniform1f(u_texColorWeight, 1.0);
   const rightArm = new Cube();
   rightArm.color = [0.0, 0.0, 0.0, 1.0];
-  rightArm.matrix.setTranslate(-0.28, 0.125, 0.0);
-  rightArm.matrix.translate(0.1, 0.05, 0.0);
+  rightArm.matrix.setTranslate(-0.21, 0.125, 0.0);
+  rightArm.matrix.translate(0.2, 0.2, 0.0);
   rightArm.matrix.rotate(-g_rightAngles[0], 0, 1, 0);
   rightArm.matrix.rotate(-g_rightAngles[1], 0, 0, 1);
   rightArm.matrix.translate(-0.1, -0.05, 0.0);
@@ -679,7 +732,7 @@ function buildArms() {
   const forearmR = new Cube();
   forearmR.color = [1.0, 0.0, 0.0, 1.0];
   forearmR.matrix = rightArmCoords;
-  forearmR.matrix.translate(-0.2, 0.0, 0.0);
+  forearmR.matrix.translate(-0.1, 0.0, 0.0);
   forearmR.matrix.translate(0.1, .05, 0.0);
   forearmR.matrix.rotate(-g_rightAngles[2], 0, 0, 1);
   forearmR.matrix.translate(-0.1, -0.05, 0.0);
@@ -691,7 +744,7 @@ function buildArms() {
   const rightHand = new Cube();
   rightHand.color = [1.0, 1.0, 1.0, 1.0];
   rightHand.matrix = forearmRCoords;
-  rightHand.matrix.translate(-0.2, 0.0, 0.0);
+  rightHand.matrix.translate(-0.1, -0.025, -0.025);
   rightHand.matrix.scale(0.1, 0.1, 0.1);
   rightHand.render();
 }
