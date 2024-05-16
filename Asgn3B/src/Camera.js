@@ -34,7 +34,6 @@ class Camera {
     this.eye.add(f);
     this.at.add(f);
     this.updateViewMatrix();
-    console.log(this.eye.elements[0]);
   }
 
   moveBackwards() {
@@ -95,26 +94,38 @@ class Camera {
     let f = new Vector3();
     let rotationMatrix = new Matrix4();
     let s;
-    const maxAngle = Math.PI / 2 - 0.1;
+    let currentAngle;
+    let newAngle;
+    const maxAngle = 179;
 
     f.set(this.at);
     f.sub(this.eye);
     f.normalize();
 
+    currentAngle = Math.acos(Vector3.dot(this.up, f) / (this.up.magnitude() * f.magnitude()));
+    currentAngle *= 180;
+    currentAngle /= Math.PI;
+
+    if(panAmount > 0) {
+      newAngle = currentAngle + panAmount;
+    } else {
+      newAngle = currentAngle - Math.abs(panAmount);
+    };
+
     // Perpendicular vector for horizontal plane of camera
     s = Vector3.cross(f, this.up);
     s.normalize();
 
-    rotationMatrix.setRotate(-panAmount, s.elements[0], s.elements[1], s.elements[2]);
 
-    let fPrime = rotationMatrix.multiplyVector3(f);
-    let currentAngle = Math.acos(Vector3.dot(fPrime, this.up) / (fPrime.magnitude() * this.up.magnitude()));
-
-    if ( (currentAngle < maxAngle || panAmount < 0) || (currentAngle > -maxAngle || panAmount > 0)) {
-      this.at.set(this.eye);
-      this.at.add(fPrime);
+    if ( (newAngle <= maxAngle) && (newAngle >= 1)) {
+      rotationMatrix.setRotate(-panAmount, s.elements[0], s.elements[1], s.elements[2]);
+    } else {
+      rotationMatrix.setRotate(0, s.elements[0], s.elements[1], s.elements[2]);
     }
 
+    let fPrime = rotationMatrix.multiplyVector3(f);
+    this.at.set(this.eye);
+    this.at.add(fPrime);
     this.updateViewMatrix();
   }
 }

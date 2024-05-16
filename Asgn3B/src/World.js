@@ -216,7 +216,6 @@ function lockAlert() {
   if (document.pointerLockElement == canvas) {
     document.onmousemove = (ev) => lookAround(ev);
   } else {
-    console.log("NO YEET");
     document.onmousemove = null;
   }
 }
@@ -317,27 +316,27 @@ function keydown(ev) {
   switch (ev.keyCode) {
     case 65: // A
       g_camera.moveLeft();
-      console.log("Hitting keycode: " + ev.keyCode);
+      //console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 68: // D
       g_camera.moveRight();
-      console.log("Hitting keycode: " + ev.keyCode);
+      //console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 87: // W
       g_camera.moveForward();
-      console.log("Hitting keycode: " + ev.keyCode);
+      //console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 83: // S
       g_camera.moveBackwards();
-      console.log("Hitting keycode: " + ev.keyCode);
+      //console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 69: // E
       g_camera.panRight();
-      console.log("Hitting keycode: " + ev.keyCode);
+      //console.log("Hitting keycode: " + ev.keyCode);
       break;
     case 81: // Q
       g_camera.panLeft();
-      console.log("Hitting keycode: " + ev.keyCode);
+      //console.log("Hitting keycode: " + ev.keyCode);
       break;
     default: return;
   }

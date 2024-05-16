@@ -33,7 +33,7 @@ input[type="button"], input[type="range"] {
 }
 
 #comments {
-    display: flex;
+    display: none;
     width: 300px;
     padding: 20px;
     position: fixed;
@@ -46,7 +46,7 @@ input[type="button"], input[type="range"] {
 }
 
 #notes {
-    display: flex;
+    display: none;
     width: 250px;
     padding: 20px;
     position: fixed;
