@@ -202,6 +202,27 @@ function addActionsForHtmlUI() {
   // Slider Events
   document.getElementById('cameraX').addEventListener('input', function() { g_globalAngle[0] = this.value; renderAllShapes(); });
   document.getElementById('cameraY').addEventListener('input', function() { g_globalAngle[1] = this.value; renderAllShapes(); });
+
+  // Lock/Unlock Cursor when Canvas Clicked
+  canvas.onclick = async () => {
+    if (!document.pointerLockElement) 
+      {await canvas.requestPointerLock();} 
+  };
+
+  document.addEventListener('pointerlockchange', lockAlert, false);
+}
+
+function lockAlert() {
+  if (document.pointerLockElement == canvas) {
+    document.onmousemove = (ev) => lookAround(ev);
+  } else {
+    console.log("NO YEET");
+    document.onmousemove = null;
+  }
+}
+
+function lookAround(ev) {
+  g_camera.horizontalPan(ev.movementX * 0.1);
 }
 
 function initTextures() {
@@ -377,7 +398,7 @@ function tick() {
 function buildSky() {
   const sky = new Cube();
   sky.color = [0.5, 0.5, 1.0, 1.0];
-  sky.matrix.scale(35, 35, 35);
+  sky.matrix.scale(20, 20, 20);
   sky.matrix.translate(-0.5, -0.5, -0.5);
   sky.render();
 }
@@ -386,11 +407,10 @@ function buildGround() {
   const ground = new Cube();
   ground.color = [0.0, 0.6, 0.4, 1.0];
   ground.matrix.translate(0, -0.1, 0.0);
-  ground.matrix.scale(35, 0, 35);
+  ground.matrix.scale(20, 0, 20);
   ground.matrix.translate(-0.5, 0.0, -0.5);
   ground.render();
 }
-
 
 // Map Key
 // 0 = No Wall
@@ -428,7 +448,7 @@ let map = [
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1],
   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] 
   // Right Corner                                                                                 // Starting Corner
@@ -436,19 +456,21 @@ let map = [
 function buildMap() {
   for (x = 0; x < 32; x++) {
     for (z = 0; z < 32; z++) {
-      let scale = 0.3;
       gl.uniform1i(u_TextureUnit, 0);
       if (map[x][z] != 0) {
-        if (map[x][z] == 2) { 
-          gl.uniform1i(u_TextureUnit, 2);
-          scale = 0.15;
-        }
         let wall = new Cube();
         wall.color = [0.0, 0.0, 0.0, 1.0];
         wall.matrix.translate(0.0, -0.1, 0.0);
-        wall.matrix.scale(scale, scale, scale);
-        wall.matrix.translate(x-5, 0.0, z-5);
-        wall.render();
+        if (map[x][z] == 2) { 
+          gl.uniform1i(u_TextureUnit, 2);
+          wall.matrix.scale(0.15, 0.15, 0.15);
+          wall.matrix.translate((x-5)*2, 0.0, (z-5)*2);
+          wall.render();
+        } else {
+          wall.matrix.scale(0.3, 0.3, 0.3);
+          wall.matrix.translate(x-5, 0.0, z-5);
+          wall.render();
+        }
       }
     }
   }

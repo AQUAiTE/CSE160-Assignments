@@ -105,4 +105,21 @@ class Camera {
 
     this.updateViewMatrix();
   }
+
+  horizontalPan(panAmount) {
+    let f = new Vector3();
+    let rotationMatrix = new Matrix4();
+
+    f.set(this.at);
+    f.sub(this.eye);
+    f.normalize();
+
+    rotationMatrix.setRotate(-panAmount, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+
+    let fPrime = rotationMatrix.multiplyVector3(f);
+    this.at.set(this.eye);
+    this.at.add(fPrime);
+
+    this.updateViewMatrix();
+  }
 }
