@@ -223,6 +223,7 @@ function lockAlert() {
 
 function lookAround(ev) {
   g_camera.horizontalPan(ev.movementX * 0.1);
+  g_camera.verticalPan(ev.movementY * 0.1);
 }
 
 function initTextures() {
