@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Virtual World 3A</title>
+    <title>Blocky World</title>
     <link rel="stylesheet" href="styles.css">
   </head>
 
@@ -11,6 +11,7 @@
       <canvas id="webgl" width="400" height="400">
         Please use a browser that supports "canvas"
       </canvas>
+
       <div id="sidePanel">
         Camera Controls:
         <br>
@@ -24,6 +25,31 @@
         
       </div>
 
+      <div id="controls">
+        Controls:
+        <br>
+        <br>
+        W: Move Forward
+        <br>
+        S: Move Backward
+        <br>
+        A: Move Left
+        <br>
+        D: Move Right
+        <br>
+        <br>
+        Q: Rotate Left
+        <br>
+        E: Rotate Right
+        <br>
+        <br>
+        Left Click (on Canvas): Lock Cursor
+        <br>
+        Left Click (In World): Delete Block
+        Right Click (In World): Add Block
+        Mouse (In World): Look Around
+      </div>
+
       <div id="notes">
         My Info and Notes to Grader:
         <ul>
@@ -31,9 +57,19 @@
           <br>
           <li>Email: fsolomon@ucsc.edu</li>
           <br>
-          <li>I have everything for 3A here: Skybox, Ground, Multiple Textures + Colors</li>
+          <li>This world contains the following:</li>
+          <ul>
+            <li>Camera Movement</li>
+            <li>Q and E Rotation</li>
+            <li>World Map</li>
+            <li>Camera Rotation</li>
+            <li>Story</li>
+            <li>(Kind of) Add/Delete Blocks</li>
+            <li>Performance</li>
+            <li>Broque Monsieur</li>
+          </ul>
           <br>
-          <li>My blocky animal got detached when I worked on the uv coords and skybox/ground. I will fix him later, but for now it's good enough to help show I have the rubric points.</li>
+          <li>My add/delete block feature is sort of inconsistent.</li>
         </ul>
       </div>
 
@@ -51,8 +87,19 @@
               <li>All rights once again reserved to Nintendo Co., Ltd. I cropped the design from a sprite and resized it.</li>
             </ul>
           <li><a href="https://www.youtube.com/playlist?list=PLbyTU_tFIkcOs7XVopOy5Oti-HGiIZx0J">Professor Davis' Walkthrough Helper</a></li>
+          <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API">Help Keeping Cursor on Canvas</a></li>
+          <li><a href="https://stackoverflow.com/questions/58483101/for-of-loop-should-i-use-const-or-let">Looping Through Array of Objects</a></li>
         </ul>
       </div>
+    </div>
+
+    <div id="caption">
+      Broque Monsieur has stumbled upon a land of scattered item blocks! It must be his lucky day!
+      <br><br>
+      Unfortunately, he has found that these blocks are nothing more than a coin each. He is becoming increasingly frustrated...
+
+      <br><br>
+      Place a block in each corner and then one in front of Broque Monsieur to appease him!
     </div>
 
     <!--Buttons/Sliders-->

@@ -3,7 +3,7 @@ class Camera {
     this.type = 'camera';
     this.fov = 60.0;
     this.eye = new Vector3([1.8130112886428833, 0.4054480791091919, -3.680333375930786]);
-    this.at = new Vector3([0.9594049453735352, -0.02990657091140747, -3.394286870956421]);
+    this.at = new Vector3([1.3110945224761963, 0.22651082277297974, -2.834129571914673]);
     this.up = new Vector3([0, 1, 0]);
 
     this.viewMatrix = new Matrix4();
@@ -126,6 +126,34 @@ class Camera {
     let fPrime = rotationMatrix.multiplyVector3(f);
     this.at.set(this.eye);
     this.at.add(fPrime);
+    this.updateViewMatrix();
+  }
+
+  panLeft() {
+    let f = new Vector3();
+    let rotationMatrix = new Matrix4();
+    rotationMatrix.setRotate(3, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+    f.set(this.at);
+    f.sub(this.eye);
+    f.normalize();
+    let fPrime = rotationMatrix.multiplyVector3(f);
+    this.at.set(this.eye);
+    this.at.add(fPrime);
+
+    this.updateViewMatrix();
+  }
+
+  panRight() {
+    let f = new Vector3();
+    let rotationMatrix = new Matrix4();
+    rotationMatrix.setRotate(-3, this.up.elements[0], this.up.elements[1], this.up.elements[2]);
+    f.set(this.at);
+    f.sub(this.eye);
+    f.normalize();
+    let fPrime = rotationMatrix.multiplyVector3(f);
+    this.at.set(this.eye);
+    this.at.add(fPrime);
+
     this.updateViewMatrix();
   }
 }
