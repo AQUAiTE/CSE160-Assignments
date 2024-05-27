@@ -4,7 +4,9 @@ var VSHADER_SOURCE = `
   precision mediump float;
   attribute vec4 a_Position;
   attribute vec2 a_UV;
+  attribute vec3 a_Normal;
   varying vec2 v_UV;
+  varying vec3 v_Normal;
   uniform mat4 u_ModelMatrix;
   uniform mat4 u_GlobalRotateMatrix;
   uniform mat4 u_ViewMatrix;
@@ -12,12 +14,14 @@ var VSHADER_SOURCE = `
   void main() {
     gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
     v_UV = a_UV;
+    v_Normal = a_Normal;
   }`
 
 // Fragment shader program
 var FSHADER_SOURCE = `
   precision mediump float;
   varying vec2 v_UV;
+  varying vec3 v_Normal;
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
   uniform sampler2D u_Sampler1;
@@ -27,7 +31,10 @@ var FSHADER_SOURCE = `
   void main() {
     gl_FragColor = vec4(v_UV, 1.0, 1.0);
     vec4 texColor;
-    if (u_TextureUnit == 0) {
+    if (u_TextureUnit == -1) {
+      texColor = vec4( (v_Normal + 1.0) / 2.0, 1.0);
+    }
+    else if (u_TextureUnit == 0) {
       texColor = texture2D(u_Sampler0, v_UV);
     }
     else if (u_TextureUnit == 1) {
@@ -62,6 +69,7 @@ let g_globalAngle = [25, 0];
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
 let g_camera;
+let g_normalOn = false;
 
 // Animation Global Vars 
 // *Note: Holdover from previous assignment, breaks the model w/o it
@@ -191,6 +199,12 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  // Get the storage location of a_Normal
+  a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
+  if (a_Normal < 0) {
+    console.log('Failed to get the storage location of a_Normal');
+    return;
+  }
 
 
   // Set identity matrix at first
@@ -203,6 +217,10 @@ function addActionsForHtmlUI() {
   // Slider Events
   document.getElementById('cameraX').addEventListener('input', function() { g_globalAngle[0] = this.value; renderAllShapes(); });
   document.getElementById('cameraY').addEventListener('input', function() { g_globalAngle[1] = this.value; renderAllShapes(); });
+
+  // Button Events
+  document.getElementById('normalsOn').onclick = function() {g_normalOn = true;};
+  document.getElementById('normalsOff').onclick = function() {g_normalOn = false;};
 
   // Lock/Unlock Cursor when Canvas Clicked
   canvas.onclick = async () => {
@@ -388,13 +406,20 @@ function renderAllShapes() {
   // Use the Sea and Clouds Image
   gl.uniform1i(u_TextureUnit, 1);
   // Use the texture
-  gl.uniform1f(u_texColorWeight, 1.0);
+  gl.uniform1f(u_texColorWeight, 1.0); 
+  if (g_normalOn) {
+    gl.uniform1i(u_TextureUnit, -1);
+  }
   buildSky();
 
   gl.uniform1f(u_texColorWeight, 0.0);
   buildGround();
 
   // Use Default Color
+  if (g_normalOn) {
+    gl.uniform1i(u_TextureUnit, -1);
+    gl.uniform1f(u_texColorWeight, 1.0);
+  }
   buildHead();
 
   buildBody();
@@ -408,6 +433,9 @@ function renderAllShapes() {
   // Use Castle Walls Texture
   gl.uniform1i(u_TextureUnit, 0);
   gl.uniform1f(u_texColorWeight, 1.0);
+  if (g_normalOn) {
+    gl.uniform1i(u_TextureUnit, -1);
+  }
   buildMap();
 
 }
@@ -486,12 +514,18 @@ function buildMap() {
   for (x = 0; x < 32; x++) {
     for (z = 0; z < 32; z++) {
       gl.uniform1i(u_TextureUnit, 0);
+      if (g_normalOn) {
+        gl.uniform1i(u_TextureUnit, -1);
+      }
       if (map[x][z] != 0) {
         let wall = new Cube();
         wall.color = [0.0, 0.0, 0.0, 1.0];
         wall.matrix.translate(0.0, -0.1, 0.0);
         if (map[x][z] == 2) { 
           gl.uniform1i(u_TextureUnit, 2);
+          if (g_normalOn) {
+            gl.uniform1i(u_TextureUnit, -1);
+          }
           wall.matrix.scale(0.15, 0.15, 0.15);
           wall.matrix.translate((x-16)*2, 0.0, (z-16)*2);
           wall.render();

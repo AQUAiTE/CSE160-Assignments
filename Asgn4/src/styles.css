@@ -94,3 +94,15 @@ input[type="button"], input[type="range"] {
     justify-content: flex-start;
     align-items: flex-start;
 }
+
+#buttons {
+    display: flex;
+    width: 250px;
+    height: 405px;
+    padding: 20px;
+    position: fixed;
+    right: 850px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
