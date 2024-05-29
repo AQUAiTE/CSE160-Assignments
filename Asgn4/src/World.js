@@ -7,6 +7,7 @@ var VSHADER_SOURCE = `
   attribute vec3 a_Normal;
   varying vec2 v_UV;
   varying vec3 v_Normal;
+  varying vec4 v_VertPos;
   uniform mat4 u_ModelMatrix;
   uniform mat4 u_GlobalRotateMatrix;
   uniform mat4 u_ViewMatrix;
@@ -15,6 +16,7 @@ var VSHADER_SOURCE = `
     gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_GlobalRotateMatrix * u_ModelMatrix * a_Position;
     v_UV = a_UV;
     v_Normal = a_Normal;
+    v_VertPos = u_ModelMatrix * a_Position;
   }`
 
 // Fragment shader program
@@ -22,12 +24,14 @@ var FSHADER_SOURCE = `
   precision mediump float;
   varying vec2 v_UV;
   varying vec3 v_Normal;
+  varying vec4 v_VertPos;
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
   uniform sampler2D u_Sampler1;
   uniform sampler2D u_Sampler2;
   uniform int u_TextureUnit;
   uniform float u_texColorWeight;
+  uniform vec3 u_LightPos;
   void main() {
     gl_FragColor = vec4(v_UV, 1.0, 1.0);
     vec4 texColor;
@@ -39,11 +43,21 @@ var FSHADER_SOURCE = `
     }
     else if (u_TextureUnit == 1) {
       texColor = texture2D(u_Sampler1, v_UV);
-    } else {
+    } 
+    else {
       texColor = texture2D(u_Sampler2, v_UV);
     }
     // Final Color/Texture Set Based on texColorWeight
     gl_FragColor = (1.0 - u_texColorWeight) * u_FragColor + u_texColorWeight * texColor;
+
+    vec3 lightVector = vec3(v_VertPos) - u_LightPos;
+    float r = length(lightVector);
+
+    if (r < 1.0) {
+      gl_FragColor = vec4(1, 0, 0, 1);
+    } else if (r < 2.0) {
+      gl_FragColor = vec4(0, 1, 0, 1);
+    }
   }`
 
 // Global Vars
@@ -61,6 +75,7 @@ let u_Sampler1;
 let u_Sampler2;
 let u_TextureUnit;
 let u_texColorWeight;
+let u_LightPos;
 
 
 // UI Global Vars
@@ -68,6 +83,7 @@ let g_globalAngle = [25, 0];
 // Shoulder X, Shoulder Y, Elbow
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
+let g_lightPos = [0, 1, -2];
 let g_camera;
 let g_normalOn = false;
 
@@ -206,6 +222,13 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  // Get the storage location of u_lightPos
+  u_LightPos = gl.getUniformLocation(gl.program, 'u_LightPos');
+  if (u_LightPos < 0) {
+    console.log('Failed to get the storage location of u_LightPos');
+    return;
+  }
+
 
   // Set identity matrix at first
   var identityM = new Matrix4();
@@ -217,6 +240,9 @@ function addActionsForHtmlUI() {
   // Slider Events
   document.getElementById('cameraX').addEventListener('input', function() { g_globalAngle[0] = this.value; renderAllShapes(); });
   document.getElementById('cameraY').addEventListener('input', function() { g_globalAngle[1] = this.value; renderAllShapes(); });
+  document.getElementById('lightX').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightPos[0] = this.value / 100; renderAllShapes(); } });
+  document.getElementById('lightY').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightPos[1] = this.value / 100; renderAllShapes(); } });
+  document.getElementById('lightZ').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightPos[2] = this.value / 100; renderAllShapes(); } });
 
   // Button Events
   document.getElementById('normalsOn').onclick = function() {g_normalOn = true;};
@@ -403,6 +429,7 @@ function renderAllShapes() {
   globalRotMatrix.rotate(g_globalAngle[1], 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMatrix.elements);
 
+
   // Use the Sea and Clouds Image
   gl.uniform1i(u_TextureUnit, 1);
   // Use the texture
@@ -420,11 +447,16 @@ function renderAllShapes() {
     gl.uniform1i(u_TextureUnit, -1);
     gl.uniform1f(u_texColorWeight, 1.0);
   }
+
+  buildLight();
+
   buildHead();
 
   buildBody();
 
   buildArms();
+
+  buildSphere();
 
   // Use the base color
   gl.uniform1f(u_texColorWeight, 0.0);
@@ -436,7 +468,7 @@ function renderAllShapes() {
   if (g_normalOn) {
     gl.uniform1i(u_TextureUnit, -1);
   }
-  buildMap();
+//  buildMap();
 
 }
 
@@ -455,7 +487,7 @@ function tick() {
 function buildSky() {
   const sky = new Cube();
   sky.color = [0.5, 0.5, 1.0, 1.0];
-  sky.matrix.scale(20, 20, 20);
+  sky.matrix.scale(-20, -20, -20);
   sky.matrix.translate(-0.5, -0.5, -0.5);
   sky.render();
 }
@@ -467,6 +499,23 @@ function buildGround() {
   ground.matrix.scale(20, 0, 20);
   ground.matrix.translate(-0.5, 0.0, -0.5);
   ground.render();
+}
+
+function buildSphere() {
+  const s = new Sphere();
+  s.matrix.scale(0.5, 0.5, 0.5);
+  s.matrix.translate(1.0, 1, -2.0);
+  s.render();
+}
+
+function buildLight() {
+  gl.uniform3f(u_LightPos, g_lightPos[0], g_lightPos[1], g_lightPos[2]);
+  var light = new Cube();
+  light.color = [2, 2, 0, 1];
+  light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
+  light.matrix.scale(0.1, 0.1, 0.1);
+  light.matrix.translate(-0.5, -0.5, -0.5);
+  light.render();
 }
 
 // Map Key
@@ -774,7 +823,6 @@ function buildArms() {
   forearmR.matrix.scale(0.1, 0.05, 0.05);
   forearmR.render();
 
-  gl.uniform1f(u_texColorWeight, 0.0);
   const rightHand = new Cube();
   rightHand.color = [1.0, 1.0, 1.0, 1.0];
   rightHand.matrix = forearmRCoords;
