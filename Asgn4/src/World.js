@@ -68,18 +68,19 @@ var FSHADER_SOURCE = `
     vec3 diffuse = u_DiffuseColor * nDotL * 0.7;
     vec3 ambient = vec3(gl_FragColor) * 0.3;
 
-    if (u_IsSpotlight) {
-      if (r < 1.0) {
-        gl_FragColor = vec4(u_DiffuseColor, 0.7);
-      } else if (r < 2.0) {
-        gl_FragColor = vec4(u_DiffuseColor, 0.9);
-      } else if (u_UseLighting) {
-        if (u_UseSpecular) {
+    if (u_UseLighting) {
+      if (u_IsSpotlight) {
+        if (r < 1.0) {
+          gl_FragColor = vec4(u_DiffuseColor, 0.7);
+        } else if (r < 2.0) {
+          gl_FragColor = vec4(u_DiffuseColor, 0.9);
+        } else if (u_UseSpecular) {
           gl_FragColor = vec4(diffuse + ambient + specular, 1.0);
         } else {
           gl_FragColor = vec4(diffuse + ambient, 1.0);
         }
       }
+
     }
   }`
 
@@ -116,6 +117,7 @@ let g_lightColor = [1.0, 1.0, 1.0];
 let g_camera;
 let g_normalOn = false;
 let g_lightsOn = true;
+let g_movingLight = false;
 
 // Animation Global Vars 
 // *Note: Holdover from previous assignment, breaks the model w/o it
@@ -318,6 +320,8 @@ function addActionsForHtmlUI() {
   document.getElementById('normalsOff').onclick = function() {g_normalOn = false;};
   document.getElementById('lightsOn').onclick = function() {g_lightsOn = true;};
   document.getElementById('lightsOff').onclick = function() {g_lightsOn = false;};
+  document.getElementById('lightMove').onclick = function() {g_movingLight = true;};
+  document.getElementById('lightStill').onclick = function() {g_movingLight = false;};
 
   // Lock/Unlock Cursor when Canvas Clicked
   canvas.onclick = async () => {
@@ -515,6 +519,10 @@ function renderAllShapes() {
   gl.uniform1i(u_UseSpecular, true);
   gl.uniform1i(u_UseLighting, g_lightsOn);
   gl.uniform1f(u_texColorWeight, 0.0);
+  if (g_normalOn) {
+    gl.uniform1i(u_TextureUnit, -1);
+    gl.uniform1f(u_texColorWeight, 1.0);
+  }
   buildLight();
 
   gl.uniform1i(u_TextureUnit, 0);
@@ -558,12 +566,15 @@ function tick() {
     stats.end();
     g_seconds = performance.now() / 1000.0 - g_startTime;
 
-    //updateAnimationAngles();
+    if (g_movingLight) {
+      updateAnimationAngles();
+    }
     requestAnimationFrame(tick);
 }
 
 function updateAnimationAngles() {
   g_lightPos[0] = Math.cos(g_seconds);
+  g_lightPos[2] = Math.sin(g_seconds) * 2;
 }
 
 
