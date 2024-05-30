@@ -32,6 +32,7 @@ var FSHADER_SOURCE = `
   uniform int u_TextureUnit;
   uniform float u_texColorWeight;
   uniform vec3 u_LightPos;
+  uniform vec3 u_cameraPos;
   void main() {
     gl_FragColor = vec4(v_UV, 1.0, 1.0);
     vec4 texColor;
@@ -50,14 +51,19 @@ var FSHADER_SOURCE = `
     // Final Color/Texture Set Based on texColorWeight
     gl_FragColor = (1.0 - u_texColorWeight) * u_FragColor + u_texColorWeight * texColor;
 
-    vec3 lightVector = vec3(v_VertPos) - u_LightPos;
+    vec3 lightVector = u_LightPos - vec3(v_VertPos);
     float r = length(lightVector);
 
-    if (r < 1.0) {
-      gl_FragColor = vec4(1, 0, 0, 1);
-    } else if (r < 2.0) {
-      gl_FragColor = vec4(0, 1, 0, 1);
-    }
+    vec3 L = normalize(lightVector);
+    vec3 N = normalize(v_Normal);
+    vec3 R = reflect(-L, N);
+    vec3 E = normalize(u_cameraPos - vec3(v_VertPos));
+    float nDotL = max(dot(N, L), 0.0);
+    float specular = pow(max(dot(E, R), 0.0), 1000.0);
+
+    vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
+    vec3 ambient = vec3(gl_FragColor) * 0.3;
+    gl_FragColor = vec4(diffuse + ambient + specular, 1.0);
   }`
 
 // Global Vars
@@ -76,6 +82,7 @@ let u_Sampler2;
 let u_TextureUnit;
 let u_texColorWeight;
 let u_LightPos;
+let u_cameraPos;
 
 
 // UI Global Vars
@@ -229,6 +236,13 @@ function connectVariablesToGLSL() {
     return;
   }
 
+  // Get the storage location of u_cameraPos
+  u_cameraPos = gl.getUniformLocation(gl.program, 'u_cameraPos');
+  if (u_cameraPos < 0) {
+    console.log('Failed to get the storage location of u_cameraPos');
+    return;
+  }
+
 
   // Set identity matrix at first
   var identityM = new Matrix4();
@@ -328,7 +342,7 @@ function main() {
   gl.clearColor(0.53, 0.87, 0.98, 1.0);
 
   //gl.clear(gl.COLOR_BUFFER_BIT);
-  tick()
+  tick();
 }
 
 // Handling Events =======================================================================================================
@@ -429,7 +443,10 @@ function renderAllShapes() {
   globalRotMatrix.rotate(g_globalAngle[1], 1, 0, 0);
   gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMatrix.elements);
 
+  gl.uniform3f(u_cameraPos, g_camera.eye.elements[0], g_camera.eye.elements[1], g_camera.eye.elements[2]);
 
+  gl.uniform1f(u_texColorWeight, 0.0);
+  buildLight();
   // Use the Sea and Clouds Image
   gl.uniform1i(u_TextureUnit, 1);
   // Use the texture
@@ -447,8 +464,6 @@ function renderAllShapes() {
     gl.uniform1i(u_TextureUnit, -1);
     gl.uniform1f(u_texColorWeight, 1.0);
   }
-
-  buildLight();
 
   buildHead();
 
@@ -472,14 +487,22 @@ function renderAllShapes() {
 
 }
 
+var g_startTime = performance.now() / 1000.0;
+var g_seconds = performance.now() / 1000.0 - g_startTime;
 function tick() {
     stats.begin();
     document.onkeydown = keydown.bind(g_camera);
     updateCamera();
     renderAllShapes();
     stats.end();
+    g_seconds = performance.now() / 1000.0 - g_startTime;
 
+    //updateAnimationAngles();
     requestAnimationFrame(tick);
+}
+
+function updateAnimationAngles() {
+  g_lightPos[0] = Math.cos(g_seconds);
 }
 
 
@@ -513,7 +536,7 @@ function buildLight() {
   var light = new Cube();
   light.color = [2, 2, 0, 1];
   light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
-  light.matrix.scale(0.1, 0.1, 0.1);
+  light.matrix.scale(-0.1, -0.1, -0.1);
   light.matrix.translate(-0.5, -0.5, -0.5);
   light.render();
 }
