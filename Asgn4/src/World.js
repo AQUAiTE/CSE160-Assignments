@@ -30,9 +30,13 @@ var FSHADER_SOURCE = `
   uniform sampler2D u_Sampler1;
   uniform sampler2D u_Sampler2;
   uniform int u_TextureUnit;
+  uniform bool u_UseSpecular;
+  uniform bool u_UseLighting;
+  uniform bool u_IsSpotlight;
   uniform float u_texColorWeight;
   uniform vec3 u_LightPos;
   uniform vec3 u_cameraPos;
+  uniform vec3 u_DiffuseColor;
   void main() {
     gl_FragColor = vec4(v_UV, 1.0, 1.0);
     vec4 texColor;
@@ -59,11 +63,24 @@ var FSHADER_SOURCE = `
     vec3 R = reflect(-L, N);
     vec3 E = normalize(u_cameraPos - vec3(v_VertPos));
     float nDotL = max(dot(N, L), 0.0);
-    float specular = pow(max(dot(E, R), 0.0), 1000.0);
 
-    vec3 diffuse = vec3(gl_FragColor) * nDotL * 0.7;
+    float specular = pow(max(dot(E, R), 0.0), 500.0);
+    vec3 diffuse = u_DiffuseColor * nDotL * 0.7;
     vec3 ambient = vec3(gl_FragColor) * 0.3;
-    gl_FragColor = vec4(diffuse + ambient + specular, 1.0);
+
+    if (u_IsSpotlight) {
+      if (r < 1.0) {
+        gl_FragColor = vec4(u_DiffuseColor, 0.7);
+      } else if (r < 2.0) {
+        gl_FragColor = vec4(u_DiffuseColor, 0.9);
+      } else if (u_UseLighting) {
+        if (u_UseSpecular) {
+          gl_FragColor = vec4(diffuse + ambient + specular, 1.0);
+        } else {
+          gl_FragColor = vec4(diffuse + ambient, 1.0);
+        }
+      }
+    }
   }`
 
 // Global Vars
@@ -83,6 +100,10 @@ let u_TextureUnit;
 let u_texColorWeight;
 let u_LightPos;
 let u_cameraPos;
+let u_UseLighting;
+let u_UseSpecular;
+let u_DiffuseColor;
+let u_IsSpotlight;
 
 
 // UI Global Vars
@@ -91,8 +112,10 @@ let g_globalAngle = [25, 0];
 let g_leftAngles = [0, 0, 0];
 let g_rightAngles = [0, 0, 0]; 
 let g_lightPos = [0, 1, -2];
+let g_lightColor = [1.0, 1.0, 1.0];
 let g_camera;
 let g_normalOn = false;
+let g_lightsOn = true;
 
 // Animation Global Vars 
 // *Note: Holdover from previous assignment, breaks the model w/o it
@@ -214,6 +237,34 @@ function connectVariablesToGLSL() {
     console.log('Failed to get the storage location of u_TextureUnit');
     return;
   }
+  // Get the storage location of u_UseLighting
+  u_UseLighting = gl.getUniformLocation(gl.program, 'u_UseLighting');
+  if (!u_UseLighting) {
+    console.log('Failed to get the storage location of u_UseLighting');
+    return;
+  }
+
+  // Get the storage location of u_IsSpotlight
+  u_IsSpotlight = gl.getUniformLocation(gl.program, 'u_IsSpotlight');
+  if (!u_IsSpotlight) {
+    console.log('Failed to get the storage location of u_IsSpotlight');
+    return;
+  }
+
+  // Get the storage location of u_UseLighting
+  u_DiffuseColor = gl.getUniformLocation(gl.program, 'u_DiffuseColor');
+  if (!u_DiffuseColor) {
+    console.log('Failed to get the storage location of u_DiffuseColor');
+    return;
+  }
+
+  // Get the storage location of u_UseSpecular
+  u_UseSpecular = gl.getUniformLocation(gl.program, 'u_UseSpecular');
+  if (!u_UseSpecular) {
+    console.log('Failed to get the storage location of u_UseSpecular');
+    return;
+  }
+
 
   // Get the storage location of u_texColorWeight
   u_texColorWeight = gl.getUniformLocation(gl.program, 'u_texColorWeight');
@@ -257,10 +308,16 @@ function addActionsForHtmlUI() {
   document.getElementById('lightX').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightPos[0] = this.value / 100; renderAllShapes(); } });
   document.getElementById('lightY').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightPos[1] = this.value / 100; renderAllShapes(); } });
   document.getElementById('lightZ').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightPos[2] = this.value / 100; renderAllShapes(); } });
+  document.getElementById('lightR').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightColor[0] = this.value; renderAllShapes(); } });
+  document.getElementById('lightG').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightColor[1] = this.value; renderAllShapes(); } });
+  document.getElementById('lightB').addEventListener('mousemove', function(ev) {if(ev.buttons == 1) { g_lightColor[2] = this.value; renderAllShapes(); } });
+  
 
   // Button Events
   document.getElementById('normalsOn').onclick = function() {g_normalOn = true;};
   document.getElementById('normalsOff').onclick = function() {g_normalOn = false;};
+  document.getElementById('lightsOn').onclick = function() {g_lightsOn = true;};
+  document.getElementById('lightsOff').onclick = function() {g_lightsOn = false;};
 
   // Lock/Unlock Cursor when Canvas Clicked
   canvas.onclick = async () => {
@@ -446,19 +503,25 @@ function renderAllShapes() {
   gl.uniform3f(u_cameraPos, g_camera.eye.elements[0], g_camera.eye.elements[1], g_camera.eye.elements[2]);
 
   gl.uniform1f(u_texColorWeight, 0.0);
-  buildLight();
-  // Use the Sea and Clouds Image
-  gl.uniform1i(u_TextureUnit, 1);
-  // Use the texture
-  gl.uniform1f(u_texColorWeight, 1.0); 
   if (g_normalOn) {
     gl.uniform1i(u_TextureUnit, -1);
+    gl.uniform1f(u_texColorWeight, 1.0); 
   }
+  // Don't Apply Specular Lighting to Skybox
+  gl.uniform1i(u_UseSpecular, false);
+  gl.uniform1i(u_IsSpotlight, true);
   buildSky();
 
+  gl.uniform1i(u_UseSpecular, true);
+  gl.uniform1i(u_UseLighting, g_lightsOn);
   gl.uniform1f(u_texColorWeight, 0.0);
+  buildLight();
+
+  gl.uniform1i(u_TextureUnit, 0);
+  gl.uniform1f(u_texColorWeight, 1.0);
   buildGround();
 
+  gl.uniform1f(u_texColorWeight, 0.0);
   // Use Default Color
   if (g_normalOn) {
     gl.uniform1i(u_TextureUnit, -1);
@@ -473,8 +536,6 @@ function renderAllShapes() {
 
   buildSphere();
 
-  // Use the base color
-  gl.uniform1f(u_texColorWeight, 0.0);
   buildLegs();
 
   // Use Castle Walls Texture
@@ -509,8 +570,8 @@ function updateAnimationAngles() {
 // Build the Sky and Ground ================================================================================================
 function buildSky() {
   const sky = new Cube();
-  sky.color = [0.5, 0.5, 1.0, 1.0];
-  sky.matrix.scale(-20, -20, -20);
+  sky.color = [0.2, 0.2, 1.0, 1.0];
+  sky.matrix.scale(-15, -15, -15);
   sky.matrix.translate(-0.5, -0.5, -0.5);
   sky.render();
 }
@@ -518,8 +579,8 @@ function buildSky() {
 function buildGround() {
   const ground = new Cube();
   ground.color = [0.0, 0.6, 0.4, 1.0];
-  ground.matrix.translate(0, -0.1, 0.0);
-  ground.matrix.scale(20, 0, 20);
+  ground.matrix.translate(0, -0.55, 0.0);
+  ground.matrix.scale(15, 0.5, 15);
   ground.matrix.translate(-0.5, 0.0, -0.5);
   ground.render();
 }
@@ -527,14 +588,15 @@ function buildGround() {
 function buildSphere() {
   const s = new Sphere();
   s.matrix.scale(0.5, 0.5, 0.5);
-  s.matrix.translate(1.0, 1, -2.0);
+  s.matrix.translate(1.0, 1, -4.0);
   s.render();
 }
 
 function buildLight() {
   gl.uniform3f(u_LightPos, g_lightPos[0], g_lightPos[1], g_lightPos[2]);
+  gl.uniform3f(u_DiffuseColor, g_lightColor[0], g_lightColor[1], g_lightColor[2]);
   var light = new Cube();
-  light.color = [2, 2, 0, 1];
+  light.color = [g_lightColor[0], g_lightColor[1], g_lightColor[2], g_lightColor[3]];
   light.matrix.translate(g_lightPos[0], g_lightPos[1], g_lightPos[2]);
   light.matrix.scale(-0.1, -0.1, -0.1);
   light.matrix.translate(-0.5, -0.5, -0.5);
