@@ -9,30 +9,34 @@
   <body onload="main()">
     <div id="container">
       <div id="notes">
-        Notes to Grader for Assignment 5B:
+        Notes to Grader for Assignment 5C:
         <ul>
           <li>Name: Matthew Solomon</li>
           <br>
           <li>Email: fsolomon@ucsc.edu</li>
           <br>
-          <li>This project contains 29 Primary Shapes/Objects:</li>
-          <ul>
-            <li>12 Pokeballs</li>
-            <li>12 Pokemon .obj Models</li>
-            <li>2 Pokemon Trainer .obj Models</li>
-            <li>1 Multi-Texture Cube</li>
-            <li>2 Spinning Cylinders</li>
-            <li>1 Floor Plane</li>
-          </ul>
+          <li>This project still contains all of the requirements from 5A and 5B, but has been fleshed out a bit to become fully interactive!</li>
           <br>
-          <li>This project contains 3 Lights:</li>
-          <ul>
-            <li>Directional Light: White, pointing from the northwest at a southeast angle</li>
-            <li>Hemisphere Light: Aqua Sky and Tan Ground, to tint the top of the models and mimic the ground texture</li>
-            <li>Spotlight Light: White, to highlight the battle on the arena!</li>
-          </ul>
-          <li>A skybox in the form of an HDR Pokemon Center.</li>
-          <li>Orbit Controls for the camera.</li>
+          <li>So welcome to the Miror B vs Serena 6v6 Pokemon Battle!</li>
+          <br>
+        </ul>
+        <br>
+        Instructions for Playing:
+        <ul>
+          <li>Each turn the player on the right (Serena) will make their attack choice first.</li>
+          <li>To attack, click the your Pokemon in the center and choose an attack.</li>
+          <li>You may also view that Pokemon's stats or any other Pokemon on your team by clicking on them.</li>
+          <li>Player 2 will then make their choice and the turn will play out.</li>
+          <li>When a Pokemon faints, that player should select another Pokemon from their bench.</li>
+          <li>Fight until 1 player wins as the MASTER POKEMON TRAINER!</li>
+        </ul>
+
+        <br>
+        Future Features (if I choose to build onto it):
+        <ul>
+          <li>Allow Pokemon Switching</li>
+          <li>Add abilities and effects like poison, burn, freeze</li>
+          <li>Long Term: Refactor to use PokeAPI and allow teams to be chosen and generated</li>
         </ul>
       </div>
 
@@ -67,12 +71,6 @@
               Created by a user named "FristiStains" on open3dlab. Used as the skybox background, and is used under the CC BY-NC-SA 4.0 International License.
             </li>
           </ul>
-        </ul>
-      </div>
-      
-      <div id="citations2">
-        Citations Part 2:
-        <ul>
           <li><a href="https://www.patreon.com/posts/pokemon-arena-33246223">Pokemon Battle Arena</a></li>
           <ul>
             <li>
@@ -81,7 +79,26 @@
             <li>
               Created by a Patreon user named "Miscellanea Maps" who creates maps for various tabletop games. Is permitted for use as being offered on their free tier.
             </li>
+            </ul> 
+          <li><a href="https://gist.github.com/apaleslimghost/0d25ec801ca4fc43317bcff298af43c3">Pokemon Type Color Codes</a></li>
+          <ul>
+            <li>Used to mimic the colors used in actual Pokemon games.</li>
           </ul>
+        </ul>
+      </div>
+      
+      <div id="citations2">
+        Citations Part 2:
+        <ul>
+          <li><a href="https://bulbapedia.bulbagarden.net/wiki/Damage#Generation_V_onward">Bulbapedia Damage Article</a></li>
+            <ul>
+              <li>Used for the algorithm that actual Pokemon games use to calculate damage. See my <code>calculateDamage()</code> function for its usage.</li>
+              <li>The specific section I linked is the formula I used.</li>
+            </ul>
+          <li><a href="https://pokemondb.net/">PokemonDB</a></li>
+            <ul>
+              <li>Used for stats, types, etc.</li>
+            </ul>
           <li><a href="https://www.deviantart.com/foxboy614/art/Pokemon-Versus-Template-674177779">Pokemon Versus Template Image</a></li>
           <ul>
             <li>
@@ -99,6 +116,10 @@
           <ul>
             <li>Used for help with camera GUI and adding the skybox.</li>
           </ul>
+          <li><a href="https://grid.layoutit.com/">CSS Grid Generator</a></li>
+          <ul>
+            <li>Used to help me design the menus.</li>
+          </ul> 
         </ul>
       </div>
     </div>
